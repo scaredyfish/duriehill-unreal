@@ -3,3 +3,6 @@ Binaries
 Intermediate
 DerivedDataCache
 
+.vs
+/Saved
+/Content/Movies/*/*.jpg
