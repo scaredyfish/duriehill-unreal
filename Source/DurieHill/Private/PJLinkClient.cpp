@@ -22,10 +22,7 @@ PJLinkClient::~PJLinkClient()
 
 bool PJLinkClient::Connect()
 {
-    if (Socket == nullptr)
-    {
-        return false;
-    }
+    Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("PJLinkClient"), false);
 
     FIPv4Address IPAddress;
     FIPv4Address::Parse(Address, IPAddress);
@@ -37,7 +34,21 @@ bool PJLinkClient::Connect()
     return Socket->Connect(*Addr);
 }
 
-FString PJLinkClient::Authorize()
+bool PJLinkClient::Disconnect()
+{
+    if (Socket == nullptr)
+    {
+        return false;
+    }
+
+    Socket->Close();
+    ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
+    Socket = nullptr;
+
+    return true;
+}
+
+FString PJLinkClient::Authorize(const FString& Command)
 {
     if (Socket == nullptr)
     {
@@ -61,7 +72,9 @@ FString PJLinkClient::Authorize()
     Salt.Append(Password);
     UE_LOG(LogPJLink, Log, TEXT("Salted password: %s"), *Salt);
     FString HashedPassword = FMD5::HashAnsiString(*Salt);
-    HashedPassword.Append(TEXT("%1POWR ?\r"));
+
+    FString FullCommand = FString::Printf(TEXT("%%1%s\r"), *Command);
+    HashedPassword.Append(FullCommand);
 
     UE_LOG(LogPJLink, Log, TEXT("Sending data: %s"), *HashedPassword);
     Socket->Send((uint8*)(TCHAR_TO_UTF8(*HashedPassword)), HashedPassword.Len(), BytesRead);
@@ -76,24 +89,36 @@ FString PJLinkClient::Authorize()
 
 FString PJLinkClient::SendCommand(const FString& Command)
 {
+    
     if (Socket == nullptr || !(Socket->GetConnectionState() == ESocketConnectionState::SCS_Connected)) 
     {
-        return FString("ERRA");
+        if (Connect() == false) {
+            return FString("ERRA");
+        }
+        Authorize();
     }
 
     uint8 RecvData[18];
     int32 BytesRead;
-    TArray<uint8> SendData;
+
     FString FullCommand = FString::Printf(TEXT("%%1%s\r"), *Command);
-    SendData.Append((uint8*)TCHAR_TO_UTF8(*FullCommand), FullCommand.Len());
 
     int32 BytesSent;
-    Socket->Send(SendData.GetData(), SendData.Num(), BytesSent);
+    UE_LOG(LogPJLink, Log, TEXT("Sending data: %s"), *FullCommand);
+    bool result = Socket->Send((uint8*)(TCHAR_TO_UTF8(*FullCommand)), FullCommand.Len(), BytesSent);
+
+    if (!result) {
+        return FString("ERRA");
+    }
 
     Socket->Recv(RecvData, sizeof(RecvData), BytesRead);
     FString Response = FString(BytesRead, UTF8_TO_TCHAR(RecvData));
 
     UE_LOG(LogPJLink, Log, TEXT("Received data: %s"), *Response);
+
+    Socket->Close();
+    ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
+    Socket = nullptr;
 
     return Response;
 }

@@ -13,7 +13,8 @@ public:
     ~PJLinkClient();
 
     bool Connect();
-    FString Authorize();
+    bool Disconnect();
+    FString Authorize(const FString& Command = "POWR ?");
     FString SendCommand(const FString& Command);
     FString Password;
     FString Address;
