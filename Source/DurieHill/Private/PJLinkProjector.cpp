@@ -7,17 +7,23 @@
 
 APJLinkProjector::APJLinkProjector()
 {
-    // Initialize the PJLinkClient
-    Client = new PJLinkClient();
+    
+    
 }
 
 void APJLinkProjector::BeginPlay()
 {
     Super::BeginPlay();
-
-    // Connect to the projector
-    Client->Connect(IPAddress);
-    Client->Authorize(Password);
+    Client = new PJLinkClient(IPAddress, Password);
+    FString Status = Client->SendCommand("POWR ?");
+   
+    if (Status.Contains("ERRA")) {
+        CurrentStatus = EPJLinkStatus::Unknown;
+    } else if (Status.Contains("POWR=1")) {
+		CurrentStatus = EPJLinkStatus::On;
+	} else if (Status.Contains("POWR=0")) {
+		CurrentStatus = EPJLinkStatus::Off;
+	}
 }
 
 void APJLinkProjector::On()
@@ -39,8 +45,7 @@ void APJLinkProjector::Off()
 
     if (!Status.Contains("ERRA")) {
         CurrentStatus =  EPJLinkStatus::Off;
-    }
-    else {
+    } else {
         CurrentStatus = EPJLinkStatus::On;
     }
 }
@@ -57,3 +62,4 @@ void APJLinkProjector::Status(FString& Status)
 		CurrentStatus = EPJLinkStatus::Off;
 	}   
 }
+

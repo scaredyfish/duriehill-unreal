@@ -54,8 +54,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (MultiLine = "true"))
 	FString Password;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere , Category = "Default")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Default")
 	EPJLinkStatus CurrentStatus;
+	
 private:
 	PJLinkClient* Client;
 };

@@ -4,9 +4,11 @@
 
 DEFINE_LOG_CATEGORY(LogPJLink);
 
-PJLinkClient::PJLinkClient()
+PJLinkClient::PJLinkClient(const FString& InIPAddress, const FString& InPassword)
 {
-    Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("PJLinkClient"), false);
+    Password = InPassword;
+    Address = InIPAddress;
+    Socket = nullptr;
 }
 
 PJLinkClient::~PJLinkClient()
@@ -18,28 +20,36 @@ PJLinkClient::~PJLinkClient()
     }
 }
 
-bool PJLinkClient::Connect(const FString& InIPAddress)
+bool PJLinkClient::Connect()
 {
-    if (Socket == nullptr)
+    if (Socket != nullptr)
     {
-        return false;
+        Socket->Close();
+        ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
     }
-
+    Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("PJLinkClient"), false);
+    
     FIPv4Address IPAddress;
-    FIPv4Address::Parse(InIPAddress, IPAddress);
+    FIPv4Address::Parse(Address, IPAddress);
 
     TSharedRef<FInternetAddr> Addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     Addr->SetIp(IPAddress.Value);
     Addr->SetPort(4352); // Default PJLink port
 
-    return Socket->Connect(*Addr);
+    if (Socket->Connect(*Addr))
+    {
+        return true;
+    }
+
+    return false;
 }
 
-bool PJLinkClient::Authorize(const FString& InPassword)
+FString PJLinkClient::Authorize(const FString& Command)
 {
-    if (Socket == nullptr)
+    if (Socket == nullptr || !(Socket->GetConnectionState() == ESocketConnectionState::SCS_Connected))
     {
-        return false;
+        UE_LOG(LogPJLink, Log, TEXT("Cannot authorize - socket is not connected"));
+        return FString("ERRA");
     }
 
     uint8 RecvData[18];
@@ -55,28 +65,45 @@ bool PJLinkClient::Authorize(const FString& InPassword)
     // read the last 8 bytes of the received data
     FString Salt = Response;
     Salt.MidInline(9, 8);
-    Salt.Append(TEXT(" "));
+    UE_LOG(LogPJLink, Log, TEXT("Salt: %s"), *Salt);
     // append salt to password
-    Salt.Append(InPassword);
+    Salt.Append(Password);
     
-    FString HashedPassword = FMD5::HashAnsiString(*InPassword);
-    HashedPassword.Append(TEXT("%1POWR ?\r"));
+    UE_LOG(LogPJLink, Log, TEXT("Salted password: %s"), *Salt);
+    FString HashedPassword = FMD5::HashAnsiString(*Salt);
+    HashedPassword.Append(Command);
+
+    UE_LOG(LogPJLink, Log, TEXT("Sending data: %s"), *HashedPassword);
     Socket->Send((uint8*)TCHAR_TO_UTF8(*HashedPassword), HashedPassword.Len(), BytesRead);
 
-    Socket->Recv(RecvData, sizeof(RecvData), BytesRead);
+    if (Socket->Wait(ESocketWaitConditions::WaitForRead, FTimespan(0, 0, 10)))
+    {
+        Socket->Recv(RecvData, 1, BytesRead);
+    }
+    else
+    {
+        // Handle timeout, for example log a message and return
+        UE_LOG(LogTemp, Warning, TEXT("Timeout waiting for data from socket"));
+        return FString("ERRA");
+    }
+
     Response = FString(BytesRead, UTF8_TO_TCHAR(RecvData));
 
     UE_LOG(LogPJLink, Log, TEXT("Received data: %s"), *Response);
 
-
-    return true;
+    return Response;
 }
 
 FString PJLinkClient::SendCommand(const FString& Command)
 {
-    if (Socket == nullptr)
+    if (Socket == nullptr || !(Socket->GetConnectionState() == ESocketConnectionState::SCS_Connected))
     {
-        return FString();
+        UE_LOG(LogPJLink, Log, TEXT("Socket is not connected"));
+        if (Connect()) {
+            return Authorize(Command);
+        } else {
+            return FString("ERRA");
+        }
     }
 
     uint8 RecvData[18];
@@ -86,6 +113,7 @@ FString PJLinkClient::SendCommand(const FString& Command)
     SendData.Append((uint8*)TCHAR_TO_UTF8(*FullCommand), FullCommand.Len());
 
     int32 BytesSent;
+    UE_LOG(LogPJLink, Log, TEXT("Sending data: %s"), *FullCommand);
     Socket->Send(SendData.GetData(), SendData.Num(), BytesSent);
 
     Socket->Recv(RecvData, sizeof(RecvData), BytesRead);
