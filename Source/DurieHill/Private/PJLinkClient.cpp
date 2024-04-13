@@ -4,9 +4,11 @@
 
 DEFINE_LOG_CATEGORY(LogPJLink);
 
-PJLinkClient::PJLinkClient()
+PJLinkClient::PJLinkClient(const FString& InIPAddress, const FString& InPassword)
 {
-     Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("PJLinkClient"), false);
+    Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("PJLinkClient"), false);
+    Address = InIPAddress;
+    Password = InPassword;
 }
 
 PJLinkClient::~PJLinkClient()
@@ -18,7 +20,7 @@ PJLinkClient::~PJLinkClient()
     }
 }
 
-bool PJLinkClient::Connect(const FString& InIPAddress)
+bool PJLinkClient::Connect()
 {
     if (Socket == nullptr)
     {
@@ -26,7 +28,7 @@ bool PJLinkClient::Connect(const FString& InIPAddress)
     }
 
     FIPv4Address IPAddress;
-    FIPv4Address::Parse(InIPAddress, IPAddress);
+    FIPv4Address::Parse(Address, IPAddress);
 
     TSharedRef<FInternetAddr> Addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     Addr->SetIp(IPAddress.Value);
@@ -35,7 +37,7 @@ bool PJLinkClient::Connect(const FString& InIPAddress)
     return Socket->Connect(*Addr);
 }
 
-FString PJLinkClient::Authorize(const FString& InPassword)
+FString PJLinkClient::Authorize()
 {
     if (Socket == nullptr)
     {
@@ -56,7 +58,7 @@ FString PJLinkClient::Authorize(const FString& InPassword)
     FString Salt = Response;
     Salt.MidInline(9, 8);
     // append salt to password
-    Salt.Append(InPassword);
+    Salt.Append(Password);
     UE_LOG(LogPJLink, Log, TEXT("Salted password: %s"), *Salt);
     FString HashedPassword = FMD5::HashAnsiString(*Salt);
     HashedPassword.Append(TEXT("%1POWR ?\r"));
@@ -74,7 +76,7 @@ FString PJLinkClient::Authorize(const FString& InPassword)
 
 FString PJLinkClient::SendCommand(const FString& Command)
 {
-    if (Socket == nullptr)
+    if (Socket == nullptr || !(Socket->GetConnectionState() == ESocketConnectionState::SCS_Connected)) 
     {
         return FString("ERRA");
     }

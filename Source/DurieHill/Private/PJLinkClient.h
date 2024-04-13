@@ -9,13 +9,15 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPJLink, Log, All);
 class PJLinkClient
 {
 public:
-    PJLinkClient();
+    PJLinkClient(const FString& InIPAddress, const FString& InPassword);
     ~PJLinkClient();
 
-    bool Connect(const FString& InIPAddress);
-    FString Authorize(const FString& InPassword);
+    bool Connect();
+    FString Authorize();
     FString SendCommand(const FString& Command);
-
+    FString Password;
+    FString Address;
 private:
     FSocket* Socket;
+
 };
