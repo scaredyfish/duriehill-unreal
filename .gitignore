@@ -6,3 +6,5 @@ DerivedDataCache
 .vs
 /Saved
 /Content/Movies/*/*.jpg
+.vscode
+Samples

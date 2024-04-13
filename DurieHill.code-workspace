@@ -1,0 +1,869 @@
+{
+	"folders": [
+		{
+			"name": "DurieHill",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "/home/andrew/bin/UnrealEngine"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off",
+		"dotnet.defaultSolution": "disable"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp",
+			"vadimcn.vscode-lldb",
+			"ms-vscode.mono-debug",
+			"dfarley1.file-picker"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "DurieHill Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill Linux Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill Linux Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill Linux Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"Linux",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill LinuxArm64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill LinuxArm64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill LinuxArm64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill LinuxArm64 Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Test",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHill LinuxArm64 Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHill LinuxArm64 Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHill",
+					"LinuxArm64",
+					"Shipping",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHillEditor Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Debug",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHillEditor Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"DebugGame",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"DurieHillEditor Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			},
+			{
+				"label": "DurieHillEditor Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"DurieHillEditor",
+					"Linux",
+					"Development",
+					"/home/andrew/DurieHill/DurieHill.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/andrew/bin/UnrealEngine"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch DurieHill (Debug)",
+				"request": "launch",
+				"program": "/home/andrew/DurieHill/Binaries/Linux/UnrealGame-Linux-Debug",
+				"preLaunchTask": "DurieHill Linux Debug Build",
+				"args": [
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHill (DebugGame)",
+				"request": "launch",
+				"program": "/home/andrew/DurieHill/Binaries/Linux/UnrealGame-Linux-DebugGame",
+				"preLaunchTask": "DurieHill Linux DebugGame Build",
+				"args": [
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHill (Development)",
+				"request": "launch",
+				"program": "/home/andrew/DurieHill/Binaries/Linux/UnrealGame",
+				"preLaunchTask": "DurieHill Linux Development Build",
+				"args": [
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHill (Test)",
+				"request": "launch",
+				"program": "/home/andrew/DurieHill/Binaries/Linux/UnrealGame-Linux-Test",
+				"preLaunchTask": "DurieHill Linux Test Build",
+				"args": [
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHill (Shipping)",
+				"request": "launch",
+				"program": "/home/andrew/DurieHill/Binaries/Linux/UnrealGame-Linux-Shipping",
+				"preLaunchTask": "DurieHill Linux Shipping Build",
+				"args": [
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHillEditor (Debug)",
+				"request": "launch",
+				"program": "/home/andrew/bin/UnrealEngine/Engine/Binaries/Linux/UnrealEditor-Linux-Debug",
+				"preLaunchTask": "DurieHillEditor Linux Debug Build",
+				"args": [
+					"/home/andrew/DurieHill/DurieHill.uproject"
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHillEditor (DebugGame)",
+				"request": "launch",
+				"program": "/home/andrew/bin/UnrealEngine/Engine/Binaries/Linux/UnrealEditor-Linux-DebugGame",
+				"preLaunchTask": "DurieHillEditor Linux DebugGame Build",
+				"args": [
+					"/home/andrew/DurieHill/DurieHill.uproject"
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Launch DurieHillEditor (Development)",
+				"request": "launch",
+				"program": "/home/andrew/bin/UnrealEngine/Engine/Binaries/Linux/UnrealEditor",
+				"preLaunchTask": "DurieHillEditor Linux Development Build",
+				"args": [
+					"/home/andrew/DurieHill/DurieHill.uproject"
+				],
+				"cwd": "/home/andrew/bin/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/andrew/bin/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Linux Development Build",
+				"program": "/home/andrew/bin/UnrealEngine/Engine/Build/BatchFiles/RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=/home/andrew/DurieHill/DurieHill.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"console": "internalConsole",
+				"internalConsoleOptions": "openOnSessionStart",
+				"stopAtEntry": false,
+				"cwd": "/home/andrew/bin/UnrealEngine"
+			}
+		]
+	}
+}
