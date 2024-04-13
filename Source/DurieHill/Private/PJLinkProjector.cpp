@@ -7,15 +7,15 @@
 
 APJLinkProjector::APJLinkProjector()
 {
-    
-    
+    Client = new PJLinkClient();
 }
 
 void APJLinkProjector::BeginPlay()
 {
     Super::BeginPlay();
-    Client = new PJLinkClient(IPAddress, Password);
-    FString Status = Client->SendCommand("POWR ?");
+    
+    Client->Connect(IPAddress);
+    FString Status = Client->Authorize(Password);
    
     if (Status.Contains("ERRA")) {
         CurrentStatus = EPJLinkStatus::Unknown;
