@@ -58,5 +58,5 @@ public:
 	EPJLinkStatus CurrentStatus;
 	
 private:
-	PJLinkClient* Client;
+	PJLinkClient* Client = nullptr;
 };

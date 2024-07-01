@@ -31,6 +31,11 @@ void APJLinkProjector::BeginPlay()
 
 void APJLinkProjector::On()
 {
+    if (Client == nullptr) {
+        UE_LOG(LogPJLink, Warning, TEXT("Client not initialised"));
+        Client = new PJLinkClient(IPAddress, Password);
+    }
+
     // Turn on the projector
     Client->Connect();
     FString Status = Client->Authorize("POWR 1");
@@ -46,6 +51,11 @@ void APJLinkProjector::On()
 
 void APJLinkProjector::Off()
 {
+    if (Client == nullptr) {
+        UE_LOG(LogPJLink, Warning, TEXT("Client not initialised"));
+        Client = new PJLinkClient(IPAddress, Password);
+    }
+
     // Turn off the projector
     Client->Connect();
     FString Status = Client->Authorize("POWR 0");
