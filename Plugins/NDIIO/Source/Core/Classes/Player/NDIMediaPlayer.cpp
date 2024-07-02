@@ -16,6 +16,7 @@
 #include <Misc/EngineVersionComparison.h>
 
 
+
 #define LOCTEXT_NAMESPACE "FNDIMediaPlayer"
 
 
@@ -30,7 +31,7 @@ public:
 	{
 		VideoFrame = InVideoFrame;
 		Receiver = InReceiver;
-		Time = InTime;
+		Time = (FMediaTimeStamp)InTime;
 
 		if (InVideoFrame.FourCC == NDIlib_FourCC_video_type_UYVY)
 			Data.assign(InVideoFrame.p_data, InVideoFrame.p_data + InVideoFrame.line_stride_in_bytes * InVideoFrame.yres);

@@ -391,7 +391,9 @@ void UNDIMediaSender::Initialize()
 				.SetFlags(ETextureCreateFlags::RenderTargetable)
 				.SetClearValue(FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)));
 
-			RenderableTexture = RHICreateTexture(CreateDesc);
+			ENQUEUE_RENDER_COMMAND(CreateTextureCommand)([this, CreateDesc](FRHICommandListImmediate& RHICmdList) {
+				this->DefaultVideoTextureRHI = RHICreateTexture(CreateDesc);
+			});
 #elif ENGINE_MAJOR_VERSION == 5
 			TRefCountPtr<FRHITexture2D> ShaderTexture2D;
 
@@ -413,7 +415,7 @@ void UNDIMediaSender::Initialize()
 			#error "Unsupported engine major version"
 #endif
 
-			DefaultVideoTextureRHI = (FTexture2DRHIRef&)RenderableTexture;
+		//	DefaultVideoTextureRHI = (FTexture2DRHIRef&)RenderableTexture;
 
 #if UE_EDITOR
 
@@ -1239,7 +1241,14 @@ void UNDIMediaSender::MappedTexture::Create(FIntPoint InFrameSize)
 		.SetFormat(PF_B8G8R8A8)
 		.SetNumMips(1)
 		.SetFlags(ETextureCreateFlags::CPUReadback);
-	Texture = RHICreateTexture(CreateDesc);
+
+	ENQUEUE_RENDER_COMMAND(CreateTexture)(
+		[this, CreateDesc](FRHICommandListImmediate& RHICmdList)
+		{
+			this->Texture = RHICreateTexture(CreateDesc);
+		}
+	);
+	
 #elif ENGINE_MAJOR_VERSION == 5
 	// Resource creation structure
 	FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaSenderMappedTexture"));
@@ -1258,7 +1267,7 @@ void UNDIMediaSender::MappedTexture::Create(FIntPoint InFrameSize)
 
 	pData = nullptr;
 
-	check(Texture.IsValid() == true);
+	// check(Texture.IsValid() == true);
 	check(pData == nullptr);
 }
 

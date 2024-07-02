@@ -10,7 +10,7 @@
 #include <NDIIOPluginAPI.h>
 
 #include <MediaIOCorePlayerBase.h>
-
+#include <Objects/Media/NDIMediaReceiver.h>
 
 class FNDIMediaPlayer : public FMediaIOCorePlayerBase
 {

@@ -69,7 +69,7 @@ void UNDIMediaTexture2D::UpdateTextureReference(FRHICommandList& RHICmdList, FTe
 
 				ENQUEUE_RENDER_COMMAND(FNDIMediaTexture2DUpdateTextureReference)
 				([this](FRHICommandListImmediate& RHICmdList) {
-					RHIUpdateTextureReference(TextureReference.TextureReferenceRHI, Resource->TextureRHI);
+					RHIUpdateTextureReference(TextureReference.TextureReferenceRHI, GetResource()->TextureRHI);
 				});
 
 				// Make sure _RenderThread is executed before continuing
@@ -133,7 +133,7 @@ FTextureResource* UNDIMediaTexture2D::CreateResource()
 
 		ENQUEUE_RENDER_COMMAND(FNDIMediaTexture2DUpdateTextureReference)
 		([this](FRHICommandListImmediate& RHICmdList) {
-			RHIUpdateTextureReference(TextureReference.TextureReferenceRHI, Resource->TextureRHI);
+			RHIUpdateTextureReference(TextureReference.TextureReferenceRHI, GetResource()->TextureRHI);
 		});
 	}
 

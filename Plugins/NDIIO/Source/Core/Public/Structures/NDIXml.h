@@ -99,8 +99,6 @@ public:
 		{
 			return ElementParserStack.Last()->ProcessAttribute(AttributeName, AttributeValue);
 		}
-
-		return false;
 	}
 
 	virtual bool ProcessClose(const TCHAR* ElementName) override
