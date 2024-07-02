@@ -20,6 +20,7 @@
 #include <Misc/EngineVersionComparison.h>
 
 #include "Widgets/NDIWidgets.h"
+#include "PropertyEditorModule.h"
 
 
 #define LOCTEXT_NAMESPACE "FNDIEditorModule"
