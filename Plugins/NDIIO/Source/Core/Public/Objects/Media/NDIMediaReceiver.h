@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -41,7 +41,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FNDIMediaReceiverMetaDataReceived
 
 
 /**
-	A Media object representing the NDI Receiver for being able to receive Audio, Video, and Metadata over NDI®
+	A Media object representing the NDI Receiver for being able to receive Audio, Video, and Metadata over NDI
 */
 UCLASS(BlueprintType, Blueprintable, HideCategories = ("Platforms"), Category = "NDI IO",
 		HideCategories = ("Information"), AutoCollapseCategories = ("Content"),
@@ -102,7 +102,7 @@ private:
 	FNDIConnectionInformation ConnectionInformation;
 
 	/**
-		Information describing detailed information about the receiver performance when connected to an NDI® sender
+		Information describing detailed information about the receiver performance when connected to an NDI sender
 	*/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Information",
 			  META = (DisplayName = "Performance Data", AllowPrivateAccess = true))
@@ -148,7 +148,7 @@ public:
 	void BeginDestroy() override;
 
 	/**
-		Attempts to perform initialization logic for creating a receiver through the NDI® sdk api
+		Attempts to perform initialization logic for creating a receiver through the NDI sdk api
 	*/
 	enum class EUsage
 	{
@@ -171,7 +171,7 @@ public:
 	void StopConnection();
 
 	/**
-		Attempts to change the connection to another NDI® sender source
+		Attempts to change the connection to another NDI sender source
 	*/
 	UFUNCTION(BlueprintCallable, Category = "NDI IO", META = (DisplayName = "Change Connection"))
 	void ChangeConnection(const FNDIConnectionInformation& InConnectionInformation);

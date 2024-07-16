@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -29,7 +29,7 @@
 #include <string>
 
 
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 
 static FBufferRHIRef CreateColorVertexBuffer(FRHICommandListImmediate& RHICmdList, const FIntPoint& FitFrameSize, const FIntPoint& DrawFrameSize, bool OutputAlpha)
 {
@@ -130,7 +130,7 @@ static FBufferRHIRef CreateAlphaOddVertexBuffer(FRHICommandListImmediate& RHICmd
 	return VertexBufferRHI;
 }
 
-#elif ENGINE_MAJOR_VERSION == 5
+#elif ENGINE_MAJOR_VERSION == 5	// Before 5.3
 
 static FBufferRHIRef CreateColorVertexBuffer(FRHICommandListImmediate& RHICmdList, const FIntPoint& FitFrameSize, const FIntPoint& DrawFrameSize, bool OutputAlpha)
 {
@@ -227,107 +227,6 @@ static FBufferRHIRef CreateAlphaOddVertexBuffer(FRHICommandListImmediate& RHICmd
 	Vertices[3].TextureCoordinate.Set(1.0f, 1.0f);
 
 	RHIUnlockBuffer(VertexBufferRHI);
-
-	return VertexBufferRHI;
-}
-
-#elif ENGINE_MAJOR_VERSION == 4
-
-static FVertexBufferRHIRef CreateColorVertexBuffer(const FIntPoint& FitFrameSize, const FIntPoint& DrawFrameSize, bool OutputAlpha)
-{
-	FRHIResourceCreateInfo CreateInfo;
-	FVertexBufferRHIRef VertexBufferRHI = RHICreateVertexBuffer(sizeof(FMediaElementVertex) * 4, BUF_Volatile, CreateInfo);
-
-	void* VoidPtr = RHILockVertexBuffer(VertexBufferRHI, 0, sizeof(FMediaElementVertex) * 4, RLM_WriteOnly);
-
-	FMediaElementVertex* Vertices = (FMediaElementVertex*)VoidPtr;
-	if (OutputAlpha == false)
-	{
-		Vertices[0].Position.Set(-1.0f,  1.0f, 1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 1.0f,  1.0f, 1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set(-1.0f, -1.0f, 1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 1.0f, -1.0f, 1.0f, 1.0f); // Bottom Right
-	}
-	else
-	{
-		Vertices[0].Position.Set(-1.0f,  1.0f,      1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 1.0f,  1.0f,      1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set(-1.0f, -1.0f/3.0f, 1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 1.0f, -1.0f/3.0f, 1.0f, 1.0f); // Bottom Right
-	}
-
-	Vertices[0].TextureCoordinate.Set(0.0f, 0.0f);
-	Vertices[1].TextureCoordinate.Set(1.0f, 0.0f);
-	Vertices[2].TextureCoordinate.Set(0.0f, 1.0f);
-	Vertices[3].TextureCoordinate.Set(1.0f, 1.0f);
-
-	RHIUnlockVertexBuffer(VertexBufferRHI);
-
-	return VertexBufferRHI;
-}
-
-static FVertexBufferRHIRef CreateAlphaEvenVertexBuffer(const FIntPoint& FitFrameSize, const FIntPoint& DrawFrameSize, bool OutputAlpha)
-{
-	FRHIResourceCreateInfo CreateInfo;
-	FVertexBufferRHIRef VertexBufferRHI = RHICreateVertexBuffer(sizeof(FMediaElementVertex) * 4, BUF_Volatile, CreateInfo);
-
-	void* VoidPtr = RHILockVertexBuffer(VertexBufferRHI, 0, sizeof(FMediaElementVertex) * 4, RLM_WriteOnly);
-
-	FMediaElementVertex* Vertices = (FMediaElementVertex*)VoidPtr;
-	if (OutputAlpha == false)
-	{
-		Vertices[0].Position.Set(-1.0f, -1.0f, 1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 0.0f, -1.0f, 1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set(-1.0f, -1.0f, 1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 0.0f, -1.0f, 1.0f, 1.0f); // Bottom Right
-	}
-	else
-	{
-		Vertices[0].Position.Set(-1.0f, -1.0f/3.0f, 1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 0.0f, -1.0f/3.0f, 1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set(-1.0f, -1.0f,      1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 0.0f, -1.0f,      1.0f, 1.0f); // Bottom Right
-	}
-
-	Vertices[0].TextureCoordinate.Set(0.0f, 0.0f);
-	Vertices[1].TextureCoordinate.Set(1.0f, 0.0f);
-	Vertices[2].TextureCoordinate.Set(0.0f, 1.0f);
-	Vertices[3].TextureCoordinate.Set(1.0f, 1.0f);
-
-	RHIUnlockVertexBuffer(VertexBufferRHI);
-
-	return VertexBufferRHI;
-}
-
-static FVertexBufferRHIRef CreateAlphaOddVertexBuffer(const FIntPoint& FitFrameSize, const FIntPoint& DrawFrameSize, bool OutputAlpha)
-{
-	FRHIResourceCreateInfo CreateInfo;
-	FVertexBufferRHIRef VertexBufferRHI = RHICreateVertexBuffer(sizeof(FMediaElementVertex) * 4, BUF_Volatile, CreateInfo);
-
-	void* VoidPtr = RHILockVertexBuffer(VertexBufferRHI, 0, sizeof(FMediaElementVertex) * 4, RLM_WriteOnly);
-
-	FMediaElementVertex* Vertices = (FMediaElementVertex*)VoidPtr;
-	if (OutputAlpha == false)
-	{
-		Vertices[0].Position.Set( 0.0f, -1.0f, 1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 1.0f, -1.0f, 1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set( 0.0f, -1.0f, 1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 1.0f, -1.0f, 1.0f, 1.0f); // Bottom Right
-	}
-	else
-	{
-		Vertices[0].Position.Set( 0.0f, -1.0f/3.0f, 1.0f, 1.0f); // Top Left
-		Vertices[1].Position.Set( 1.0f, -1.0f/3.0f, 1.0f, 1.0f); // Top Right
-		Vertices[2].Position.Set( 0.0f, -1.0f,      1.0f, 1.0f); // Bottom Left
-		Vertices[3].Position.Set( 1.0f, -1.0f,      1.0f, 1.0f); // Bottom Right
-	}
-
-	Vertices[0].TextureCoordinate.Set(0.0f, 0.0f);
-	Vertices[1].TextureCoordinate.Set(1.0f, 0.0f);
-	Vertices[2].TextureCoordinate.Set(0.0f, 1.0f);
-	Vertices[3].TextureCoordinate.Set(1.0f, 1.0f);
-
-	RHIUnlockVertexBuffer(VertexBufferRHI);
 
 	return VertexBufferRHI;
 }
@@ -365,7 +264,7 @@ void UNDIMediaSender::Initialize()
 			ChangeRenderTargetConfiguration(FrameSize, FrameRate);
 
 			// Send audio frames at the end of the 'update' loop
-			FNDIConnectionService::EventOnSendAudioFrame.AddUObject(this, &UNDIMediaSender::TrySendAudioFrame);
+			FNDIConnectionService::AddAudioSender(this, &UNDIMediaSender::TrySendAudioFrame);
 
 			// We don't want to limit the engine rendering speed to the sync rate of the connection hook
 			// into the core delegates render thread 'EndFrame'
@@ -375,47 +274,6 @@ void UNDIMediaSender::Initialize()
 			LastRenderTime = FTimecode::FromTimespan(0, FrameRate, FTimecode::IsDropFormatTimecodeSupported(FrameRate),
 													 true // use roll-over timecode
 			);
-
-			// Default to 240p
-			static int32 DefaultWidth = 352;
-			static int32 DefaultHeight = 240;
-
-			// Set the default video texture to reference nothing
-			TRefCountPtr<FRHITexture2D> RenderableTexture;
-
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
-			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaSenderInitializeTexture"))
-				.SetExtent(DefaultWidth, DefaultHeight)
-				.SetFormat(PF_B8G8R8A8)
-				.SetNumMips(1)
-				.SetFlags(ETextureCreateFlags::RenderTargetable)
-				.SetClearValue(FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)));
-
-			ENQUEUE_RENDER_COMMAND(CreateTextureCommand)([this, CreateDesc](FRHICommandListImmediate& RHICmdList) {
-				this->DefaultVideoTextureRHI = RHICreateTexture(CreateDesc);
-			});
-#elif ENGINE_MAJOR_VERSION == 5
-			TRefCountPtr<FRHITexture2D> ShaderTexture2D;
-
-			FRHIResourceCreateInfo CreateInfo = { TEXT("NDIMediaSenderInitializeTexture"),
-												 FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)) };
-
-			RHICreateTargetableShaderResource2D(DefaultWidth, DefaultHeight, PF_B8G8R8A8, 1, TexCreate_None,
-				TexCreate_RenderTargetable, false, CreateInfo, RenderableTexture,
-				ShaderTexture2D);
-#elif ENGINE_MAJOR_VERSION == 4
-			TRefCountPtr<FRHITexture2D> ShaderTexture2D;
-
-			FRHIResourceCreateInfo CreateInfo = { FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)) };
-
-			RHICreateTargetableShaderResource2D(DefaultWidth, DefaultHeight, PF_B8G8R8A8, 1, TexCreate_None,
-				TexCreate_RenderTargetable, false, CreateInfo, RenderableTexture,
-				ShaderTexture2D);
-#else
-			#error "Unsupported engine major version"
-#endif
-
-		//	DefaultVideoTextureRHI = (FTexture2DRHIRef&)RenderableTexture;
 
 #if UE_EDITOR
 
@@ -437,6 +295,42 @@ void UNDIMediaSender::Initialize()
 	}
 }
 
+void UNDIMediaSender::PrepareDefaultTexture()
+{
+	if (!DefaultVideoTextureRHI.IsValid())
+	{
+			// Default to 240p
+			static int32 DefaultWidth = 352;
+			static int32 DefaultHeight = 240;
+
+			// Set the default video texture to reference nothing
+			TRefCountPtr<FRHITexture2D> RenderableTexture;
+
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
+			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaSenderInitializeTexture"))
+				.SetExtent(DefaultWidth, DefaultHeight)
+				.SetFormat(PF_B8G8R8A8)
+				.SetNumMips(1)
+				.SetFlags(ETextureCreateFlags::RenderTargetable)
+				.SetClearValue(FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)));
+
+			RenderableTexture = RHICreateTexture(CreateDesc);
+#elif ENGINE_MAJOR_VERSION == 5
+			TRefCountPtr<FRHITexture2D> ShaderTexture2D;
+
+			FRHIResourceCreateInfo CreateInfo = { TEXT("NDIMediaSenderInitializeTexture"),
+												 FClearValueBinding(FLinearColor(0.0f, 0.0f, 0.0f)) };
+
+			RHICreateTargetableShaderResource2D(DefaultWidth, DefaultHeight, PF_B8G8R8A8, 1, TexCreate_None,
+				TexCreate_RenderTargetable, false, CreateInfo, RenderableTexture,
+				ShaderTexture2D);
+#else
+			#error "Unsupported engine major version"
+#endif
+
+			DefaultVideoTextureRHI = (FTexture2DRHIRef&)RenderableTexture;
+	}
+}
 
 bool UNDIMediaSender::CreateSender()
 {
@@ -606,16 +500,18 @@ void UNDIMediaSender::TrySendVideoFrame(int64 time_code)
 					// performing color conversion if necessary and copy pixels into the data buffer for sending
 					if (DrawRenderTarget(RHICmdList))
 					{
-						int32 Width = 0, Height = 0;
+						int32 Width = 0, Height = 0, LineStride = 0;
 
 						// Map the staging surface so we can copy the buffer for the NDI SDK to use
-						ReadbackTextures.Map(RHICmdList, Width, Height);
+						ReadbackTextures.Map(RHICmdList, Width, Height, LineStride);
 						// Width and height are the size of the readback texture, and not the framesize represented
 						// Readback texture is used in 4:2:2 format, so actual width in pixels is double
 						Width *= 2;
 						// Readback texture may be extended in height to accomodate alpha values; remove it
 						if (ReadbackTexturesHaveAlpha == true)
 							Height = (2*Height) / 3;
+
+						NDI_video_frame.line_stride_in_bytes = LineStride;
 
 						// If we don't have a draw result, ensure we send an empty frame and resize our frame
 						if (FrameSize != FIntPoint(Width, Height))
@@ -672,13 +568,9 @@ bool UNDIMediaSender::DrawRenderTarget(FRHICommandListImmediate& RHICmdList)
 			// Find a free target-able texture from the render pool
 			GRenderTargetPool.FindFreeElement(RHICmdList, RenderTargetDescriptor, RenderTargetTexturePooled, TEXT("NDIIO"));
 
-#if ENGINE_MAJOR_VERSION >= 5
 			FRHITexture* TargetableTexture = RenderTargetTexturePooled->GetRHI();
-#elif ENGINE_MAJOR_VERSION == 4
-			FRHITexture* TargetableTexture = RenderTargetTexturePooled->GetRenderTargetItem().TargetableTexture.GetReference();
-#else
-			#error "Unsupported engine major version"
-#endif
+
+			PrepareDefaultTexture();
 
 			// Get the target size of the conversion
 			FIntPoint TargetSize = SourceTexture->GetSizeXY();
@@ -705,17 +597,9 @@ bool UNDIMediaSender::DrawRenderTarget(FRHICommandListImmediate& RHICmdList)
 			float VTop    = (NewFrameSize.Y - FrameSize.Y) / (float)(2*NewFrameSize.Y);
 			float VBottom = (NewFrameSize.Y + FrameSize.Y) / (float)(2*NewFrameSize.Y);
 
-#if ENGINE_MAJOR_VERSION >= 5
 			FBufferRHIRef ColorVertexBuffer = CreateColorVertexBuffer(RHICmdList, FrameSize, NewFrameSize, this->OutputAlpha);
 			FBufferRHIRef AlphaEvenVertexBuffer = CreateAlphaEvenVertexBuffer(RHICmdList, FrameSize, NewFrameSize, this->OutputAlpha);
 			FBufferRHIRef AlphaOddVertexBuffer = CreateAlphaOddVertexBuffer(RHICmdList, FrameSize, NewFrameSize, this->OutputAlpha);
-#elif ENGINE_MAJOR_VERSION == 4
-			FVertexBufferRHIRef ColorVertexBuffer = CreateColorVertexBuffer(FrameSize, NewFrameSize, this->OutputAlpha);
-			FVertexBufferRHIRef AlphaEvenVertexBuffer = CreateAlphaEvenVertexBuffer(FrameSize, NewFrameSize, this->OutputAlpha);
-			FVertexBufferRHIRef AlphaOddVertexBuffer = CreateAlphaOddVertexBuffer(FrameSize, NewFrameSize, this->OutputAlpha);
-#else
-			#error "Unsupported engine major version"
-#endif
 
 			// Initialize the Graphics Pipeline State Object
 			FGraphicsPipelineStateInitializer GraphicsPSOInit;
@@ -752,13 +636,7 @@ bool UNDIMediaSender::DrawRenderTarget(FRHICommandListImmediate& RHICmdList)
 				GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 				// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION >= 5
 				SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-				SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-				#error "Unsupported engine major version"
-#endif
 
 				// Set the stream source
 				RHICmdList.SetStreamSource(0, ColorVertexBuffer, 0);
@@ -808,13 +686,7 @@ bool UNDIMediaSender::DrawRenderTarget(FRHICommandListImmediate& RHICmdList)
 					GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 					// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION >= 5
 					SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-					SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-					#error "Unsupported engine major version"
-#endif
 
 					// Set the stream source
 					RHICmdList.SetStreamSource(0, AlphaEvenVertexBuffer, 0);
@@ -861,13 +733,7 @@ bool UNDIMediaSender::DrawRenderTarget(FRHICommandListImmediate& RHICmdList)
 					GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 					// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION >= 5
 					SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-					SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-					#error "Unsupported engine major version"
-#endif
 
 					// Set the stream source
 					RHICmdList.SetStreamSource(0, AlphaOddVertexBuffer, 0);
@@ -922,7 +788,7 @@ void UNDIMediaSender::ChangeRenderTargetConfiguration(FIntPoint InFrameSize, FFr
 	// Reiterate the properties that the frame needs to be when sent
 	NDI_video_frame.xres = FrameSize.X;
 	NDI_video_frame.yres = FrameSize.Y;
-	NDI_video_frame.line_stride_in_bytes = FrameSize.X * 2;
+	NDI_video_frame.line_stride_in_bytes = 0;
 	NDI_video_frame.frame_rate_D = FrameRate.Denominator;
 	NDI_video_frame.frame_rate_N = FrameRate.Numerator;
 	NDI_video_frame.FourCC = this->OutputAlpha ?  NDIlib_FourCC_type_UYVA : NDIlib_FourCC_type_UYVY;
@@ -1125,10 +991,8 @@ void UNDIMediaSender::Shutdown()
 	{
 		FScopeLock Lock(&AudioSyncContext);
 
-		// Remove ourselves from the 'LoopbackAudioDevice
-
 		// Remove the handler for the send audio frame
-		FNDIConnectionService::EventOnSendAudioFrame.RemoveAll(this);
+		FNDIConnectionService::RemoveAudioSender(this);
 	}
 
 	// Perform cleanup on the renderer related materials
@@ -1197,14 +1061,7 @@ UTextureRenderTarget2D* UNDIMediaSender::GetRenderTarget()
 FTextureResource* UNDIMediaSender::GetRenderTargetResource() const
 {
 	if(IsValid(this->RenderTarget))
-#if ENGINE_MAJOR_VERSION >= 5
 		return this->RenderTarget->GetResource();
-#elif ENGINE_MAJOR_VERSION == 4
-		return this->RenderTarget->Resource;
-#else
-		#error "Unsupported engine major version"
-		return nullptr;
-#endif
 
 	return nullptr;
 }
@@ -1232,43 +1089,7 @@ void UNDIMediaSender::MappedTexture::Create(FIntPoint InFrameSize)
 {
 	Destroy();
 
-	check(Texture.IsValid() == false);
-	check(pData == nullptr);
-
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
-	const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaSenderMappedTexture"))
-		.SetExtent(InFrameSize.X, InFrameSize.Y)
-		.SetFormat(PF_B8G8R8A8)
-		.SetNumMips(1)
-		.SetFlags(ETextureCreateFlags::CPUReadback);
-
-	ENQUEUE_RENDER_COMMAND(CreateTexture)(
-		[this, CreateDesc](FRHICommandListImmediate& RHICmdList)
-		{
-			this->Texture = RHICreateTexture(CreateDesc);
-		}
-	);
-	
-#elif ENGINE_MAJOR_VERSION == 5
-	// Resource creation structure
-	FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaSenderMappedTexture"));
-
-	// Recreate the read back texture
-	Texture = RHICreateTexture2D(InFrameSize.X, InFrameSize.Y, PF_B8G8R8A8, 1, 1, TexCreate_CPUReadback, CreateInfo);
-#elif ENGINE_MAJOR_VERSION == 4
-	// Resource creation structure
-	FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaSenderMappedTexture"));
-
-	// Recreate the read back texture
-	Texture = RHICreateTexture2D(InFrameSize.X, InFrameSize.Y, PF_B8G8R8A8, 1, 1, TexCreate_CPUReadback, CreateInfo);
-#else
-	#error "Unsupported engine major version"
-#endif
-
-	pData = nullptr;
-
-	// check(Texture.IsValid() == true);
-	check(pData == nullptr);
+	FrameSize = InFrameSize;
 }
 
 /**
@@ -1289,12 +1110,42 @@ void UNDIMediaSender::MappedTexture::Destroy()
 	check(pData == nullptr);
 }
 
+void UNDIMediaSender::MappedTexture::PrepareTexture()
+{
+	if (Texture.IsValid() && (Texture->GetSizeXY() == FrameSize))
+		return;
+
+	Destroy();
+
+	check(Texture.IsValid() == false);
+	check(pData == nullptr);
+
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
+	const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaSenderMappedTexture"))
+		.SetExtent(FrameSize.X, FrameSize.Y)
+		.SetFormat(PF_B8G8R8A8)
+		.SetNumMips(1)
+		.SetFlags(ETextureCreateFlags::CPUReadback);
+	Texture = RHICreateTexture(CreateDesc);
+#elif ENGINE_MAJOR_VERSION == 5
+	// Resource creation structure
+	FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaSenderMappedTexture"));
+
+	// Recreate the read back texture
+	Texture = RHICreateTexture2D(FrameSize.X, FrameSize.Y, PF_B8G8R8A8, 1, 1, TexCreate_CPUReadback, CreateInfo);
+#else
+	#error "Unsupported engine major version"
+#endif
+
+	pData = nullptr;
+
+	check(Texture.IsValid() == true);
+	check(pData == nullptr);
+}
+
 FIntPoint UNDIMediaSender::MappedTexture::GetSizeXY() const
 {
-	if (Texture.IsValid())
-		return Texture->GetSizeXY();
-	else
-		return FIntPoint();
+	return FrameSize;
 }
 
 /**
@@ -1303,6 +1154,8 @@ FIntPoint UNDIMediaSender::MappedTexture::GetSizeXY() const
 */
 void UNDIMediaSender::MappedTexture::Resolve(FRHICommandListImmediate& RHICmdList, FRHITexture* SourceTextureRHI, const FResolveRect& Rect, const FResolveRect& DestRect)
 {
+	PrepareTexture();
+
 	check(Texture.IsValid() == true);
 	check(pData == nullptr);
 	check(SourceTextureRHI != nullptr);
@@ -1310,7 +1163,7 @@ void UNDIMediaSender::MappedTexture::Resolve(FRHICommandListImmediate& RHICmdLis
 	// Copy to resolve target...
 	// This is by far the most expensive in terms of cost, since we are having to pull
 	// data from the gpu, while in the render thread.
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
 	RHICmdList.CopyTexture(SourceTextureRHI, Texture, FRHICopyTextureInfo());
 #else
 	// NOTE: On UE5 (at least up to and including 5.0.3) using a non-default destination
@@ -1323,13 +1176,17 @@ void UNDIMediaSender::MappedTexture::Resolve(FRHICommandListImmediate& RHICmdLis
 	Map the readback texture so that its content can be read by the CPU.
 	The readback texture must have been created. The MappedTexture must currently not be mapped.
 */
-void UNDIMediaSender::MappedTexture::Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight)
+void UNDIMediaSender::MappedTexture::Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight, int32& OutLineStride)
 {
 	check(Texture.IsValid() == true);
 	check(pData == nullptr);
 
 	// Map the staging surface so we can copy the buffer for the NDI SDK to use
-	RHICmdList.MapStagingSurface(Texture, pData, OutWidth, OutHeight);
+	int32 MappedWidth = 0, MappedHeight = 0;
+	RHICmdList.MapStagingSurface(Texture, pData, MappedWidth, MappedHeight);
+	OutWidth = FrameSize.X;
+	OutHeight = FrameSize.Y;
+	OutLineStride = MappedWidth * 4;
 
 	check(pData != nullptr);
 }
@@ -1401,7 +1258,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Create(FIntPoint InFrameSize)
 	MappedTexture& CurrentMappedTexture = MappedTextures[CurrentIndex];
 	CurrentMappedTexture.Create(InFrameSize);
 
-	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
+	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex + 3) % 4];
 	PreviousMappedTexture.Create(InFrameSize);
 }
 
@@ -1413,7 +1270,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Destroy()
 	MappedTexture& CurrentMappedTexture = MappedTextures[CurrentIndex];
 	CurrentMappedTexture.Destroy();
 
-	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
+	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex + 3) % 4];
 	PreviousMappedTexture.Destroy();
 }
 
@@ -1440,11 +1297,11 @@ void UNDIMediaSender::MappedTextureASyncSender::Resolve(FRHICommandListImmediate
 	Map the current texture of the mapped texture sender so that its content can be read by the CPU.
 	The mapped texture sender must have been created. The current texture must currently not be mapped.
 */
-void UNDIMediaSender::MappedTextureASyncSender::Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight)
+void UNDIMediaSender::MappedTextureASyncSender::Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight, int32& OutLineStride)
 {
 	// Map the staging surface so we can copy the buffer for the NDI SDK to use
 	MappedTexture& CurrentMappedTexture = MappedTextures[CurrentIndex];
-	CurrentMappedTexture.Map(RHICmdList, OutWidth, OutHeight);
+	CurrentMappedTexture.Map(RHICmdList, OutWidth, OutHeight, OutLineStride);
 }
 
 /**
@@ -1479,7 +1336,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Send(FRHICommandListImmediate& R
 	PreviousMappedTexture.Unmap(RHICmdList);
 
 	// Switch the current and previous textures
-	CurrentIndex = 1 - CurrentIndex;
+	CurrentIndex = (CurrentIndex + 1) % 4;
 }
 
 /**
@@ -1495,7 +1352,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Flush(FRHICommandListImmediate& 
 
 	// After send_video_async returns, the frame sent before this one is guaranteed to have been processed
 	// So the texture for the previous frame can be unmapped
-	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
+	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex) + 3 % 4];
 	PreviousMappedTexture.Unmap(RHICmdList);
 
 	// As the send queue was flushed, also unmap the current frame as it is not used
@@ -1503,7 +1360,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Flush(FRHICommandListImmediate& 
 	CurrentMappedTexture.Unmap(RHICmdList);
 
 	// Switch the current and previous textures
-	CurrentIndex = 1 - CurrentIndex;
+	CurrentIndex = (CurrentIndex + 1) % 4;
 }
 
 /**

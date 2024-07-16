@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <CoreMinimal.h>
+#include <Misc/FrameRate.h>
 
 #include "NDIBroadcastConfiguration.generated.h"
 
@@ -25,7 +26,7 @@ public:
 	FIntPoint FrameSize = FIntPoint(1920, 1080);
 
 	/** Represents the desired number of frames (per second) for video to be sent over NDI */
-	UPROPERTY(BlueprintReadwrite, EditAnywhere, Category = "Broadcast Settings", META = (DisplayName = "Frame Rate"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Broadcast Settings", META = (DisplayName = "Frame Rate"))
 	FFrameRate FrameRate = FFrameRate(60, 1);
 
 public:

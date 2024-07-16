@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -285,7 +285,7 @@ void UTriCasterExtComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 					ImportText = "(" + Interp.PropertyElementName + "=" + Interp.PropertyValueStr + ")";
 				else
 					ImportText = Interp.PropertyValueStr;
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 and later
 				Interp.Property->ImportText_Direct(*ImportText, Data, Interp.Object, 0);
 #else
 				Interp.Property->ImportText(*ImportText, Data, 0, Interp.Object);
@@ -302,7 +302,7 @@ void UTriCasterExtComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 					ActorComponent->UpdateComponentToWorld();
 				}
 			}
-#if (ENGINE_MAJOR_VERSION < 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION < 3))
+#if (ENGINE_MAJOR_VERSION < 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION < 3))	// Before 5.3
 			if(Interp.Property->HasAnyPropertyFlags(CPF_Interp))
 				Interp.Object->PostInterpChange(Interp.Property);
 #endif

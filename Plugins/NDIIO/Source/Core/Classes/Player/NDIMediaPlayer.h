@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -8,9 +8,9 @@
 #pragma once
 
 #include <NDIIOPluginAPI.h>
-
-#include <MediaIOCorePlayerBase.h>
 #include <Objects/Media/NDIMediaReceiver.h>
+#include <MediaIOCorePlayerBase.h>
+
 
 class FNDIMediaPlayer : public FMediaIOCorePlayerBase
 {
@@ -33,8 +33,9 @@ public:
 protected:
 	virtual bool IsHardwareReady() const override;
 	virtual void SetupSampleChannels() override;
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 	virtual TSharedPtr<FMediaIOCoreTextureSampleBase> AcquireTextureSample_AnyThread() const override;
+	virtual TSharedPtr<FMediaIOCoreTextureSampleConverter> CreateTextureSampleConverter() const override;
 #endif
 
 	void DisplayFrame(const NDIlib_video_frame_v2_t& video_frame);

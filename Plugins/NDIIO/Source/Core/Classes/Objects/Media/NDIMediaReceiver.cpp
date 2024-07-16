@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -34,7 +34,7 @@ UNDIMediaReceiver::UNDIMediaReceiver()
 }
 
 /**
-	Attempts to perform initialization logic for creating a receiver through the NDI® sdk api
+	Attempts to perform initialization logic for creating a receiver through the NDI sdk api
 */
 bool UNDIMediaReceiver::Initialize(const FNDIConnectionInformation& InConnectionInformation, UNDIMediaReceiver::EUsage InUsage)
 {
@@ -177,7 +177,7 @@ void UNDIMediaReceiver::StopConnection()
 }
 
 /**
-	Attempts to change the connection to another NDI® sender source
+	Attempts to change the connection to another NDI sender source
 */
 void UNDIMediaReceiver::ChangeConnection(const FNDIConnectionInformation& InConnectionInformation)
 {
@@ -897,7 +897,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrame(FRHICommandListImmed
 
 			// Update the shader resource for the 'SourceTexture'
 			// The source texture will be given UYVY data, so make it half-width
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
 			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaReceiverProgressiveSourceTexture"))
 				.SetExtent(FrameSize.X / 2, FrameSize.Y)
 				.SetFormat(PF_B8G8R8A8)
@@ -905,7 +905,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrame(FRHICommandListImmed
 				.SetFlags(ETextureCreateFlags::RenderTargetable | ETextureCreateFlags::Dynamic);
 
 			SourceTexture = RHICreateTexture(CreateDesc);
-#elif (ENGINE_MAJOR_VERSION == 4) || (ENGINE_MAJOR_VERSION == 5)
+#elif (ENGINE_MAJOR_VERSION == 5)
 			FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaReceiverProgressiveSourceTexture"));
 			TRefCountPtr<FRHITexture2D> DummyTexture2DRHI;
 			RHICreateTargetableShaderResource2D(FrameSize.X / 2, FrameSize.Y, PF_B8G8R8A8, 1, TexCreate_Dynamic,
@@ -921,13 +921,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrame(FRHICommandListImmed
 			DrawMode = EDrawMode::Progressive;
 		}
 
-#if ENGINE_MAJOR_VERSION >= 5
 		TargetableTexture = RenderTarget->GetRHI();
-#elif ENGINE_MAJOR_VERSION == 4
-		TargetableTexture = RenderTarget->GetRenderTargetItem().TargetableTexture;
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Initialize the Graphics Pipeline State Object
 		FGraphicsPipelineStateInitializer GraphicsPSOInit;
@@ -943,13 +937,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrame(FRHICommandListImmed
 		TShaderMapRef<FNDIIOShaderVS> VertexShader(ShaderMap);
 		TShaderMapRef<FNDIIOShaderUYVYtoBGRAPS> ConvertShader(ShaderMap);
 
-#if ENGINE_MAJOR_VERSION == 5
 		FBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer();
-#elif ENGINE_MAJOR_VERSION == 4
-		FVertexBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer();
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Needs to be called *before* ApplyCachedRenderTargets, since BeginRenderPass is caching the render targets.
 		RHICmdList.BeginRenderPass(RPInfo, TEXT("NDI Recv Color Conversion"));
@@ -970,13 +958,8 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrame(FRHICommandListImmed
 		GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 		// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION == 5
 		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-		#error "Unsupported engine major version"
-#endif
+
 		// set the stream source
 		RHICmdList.SetStreamSource(0, VertexBuffer, 0);
 
@@ -1028,7 +1011,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrameAlpha(FRHICommandList
 
 			// Update the shader resource for the 'SourceTexture'
 			// The source texture will be given UYVY data, so make it half-width
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
 			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaReceiverProgressiveAlphaSourceTexture"))
 				.SetExtent(FrameSize.X / 2, FrameSize.Y)
 				.SetFormat(PF_B8G8R8A8)
@@ -1044,7 +1027,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrameAlpha(FRHICommandList
 				.SetFlags(ETextureCreateFlags::RenderTargetable | ETextureCreateFlags::Dynamic);
 
 			SourceAlphaTexture = RHICreateTexture(CreateAlphaDesc);
-#elif (ENGINE_MAJOR_VERSION == 4) || (ENGINE_MAJOR_VERSION == 5)
+#elif (ENGINE_MAJOR_VERSION == 5)
 			FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaReceiverProgressiveAlphaSourceTexture"));
 			TRefCountPtr<FRHITexture2D> DummyTexture2DRHI;
 			RHICreateTargetableShaderResource2D(FrameSize.X/2, FrameSize.Y, PF_B8G8R8A8, 1, TexCreate_Dynamic,
@@ -1065,13 +1048,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrameAlpha(FRHICommandList
 			DrawMode = EDrawMode::ProgressiveAlpha;
 		}
 
-#if ENGINE_MAJOR_VERSION >= 5
 		TargetableTexture = RenderTarget->GetRHI();
-#elif ENGINE_MAJOR_VERSION == 4
-		TargetableTexture = RenderTarget->GetRenderTargetItem().TargetableTexture;
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Initialize the Graphics Pipeline State Object
 		FGraphicsPipelineStateInitializer GraphicsPSOInit;
@@ -1087,13 +1064,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrameAlpha(FRHICommandList
 		TShaderMapRef<FNDIIOShaderVS> VertexShader(ShaderMap);
 		TShaderMapRef<FNDIIOShaderUYVAtoBGRAPS> ConvertShader(ShaderMap);
 
-#if ENGINE_MAJOR_VERSION == 5
 		FBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer();
-#elif ENGINE_MAJOR_VERSION == 4
-		FVertexBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer();
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Needs to be called *before* ApplyCachedRenderTargets, since BeginRenderPass is caching the render targets.
 		RHICmdList.BeginRenderPass(RPInfo, TEXT("NDI Recv Color Conversion"));
@@ -1114,13 +1085,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawProgressiveVideoFrameAlpha(FRHICommandList
 		GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 		// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION == 5
 		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// set the stream source
 		RHICmdList.SetStreamSource(0, VertexBuffer, 0);
@@ -1178,7 +1143,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrame(FRHICommandListImmedi
 
 			// Update the shader resource for the 'SourceTexture'
 			// The source texture will be given UYVY data, so make it half-width
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
 			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaReceiverInterlacedSourceTexture"))
 				.SetExtent(FieldSize.X / 2, FieldSize.Y)
 				.SetFormat(PF_B8G8R8A8)
@@ -1186,7 +1151,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrame(FRHICommandListImmedi
 				.SetFlags(ETextureCreateFlags::RenderTargetable | ETextureCreateFlags::Dynamic);
 
 			SourceTexture = RHICreateTexture(CreateDesc);
-#elif (ENGINE_MAJOR_VERSION == 4) || (ENGINE_MAJOR_VERSION == 5)
+#elif (ENGINE_MAJOR_VERSION == 5)
 			FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaReceiverInterlacedSourceTexture"));
 			TRefCountPtr<FRHITexture2D> DummyTexture2DRHI;
 			RHICreateTargetableShaderResource2D(FieldSize.X/2, FieldSize.Y, PF_B8G8R8A8, 1, TexCreate_Dynamic,
@@ -1202,13 +1167,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrame(FRHICommandListImmedi
 			DrawMode = EDrawMode::Interlaced;
 		}
 
-#if ENGINE_MAJOR_VERSION >= 5
 		TargetableTexture = RenderTarget->GetRHI();
-#elif ENGINE_MAJOR_VERSION == 4
-		TargetableTexture = RenderTarget->GetRenderTargetItem().TargetableTexture;
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Initialize the Graphics Pipeline State Object
 		FGraphicsPipelineStateInitializer GraphicsPSOInit;
@@ -1225,13 +1184,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrame(FRHICommandListImmedi
 		TShaderMapRef<FNDIIOShaderUYVYtoBGRAPS> ConvertShader(ShaderMap);
 
 		float FieldUVOffset = (Result.frame_format_type == NDIlib_frame_format_type_field_1) ? 0.5f/Result.yres : 0.f;
-#if ENGINE_MAJOR_VERSION == 5
 		FBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer(0.f, 1.f, 0.f-FieldUVOffset, 1.f-FieldUVOffset);
-#elif ENGINE_MAJOR_VERSION == 4
-		FVertexBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer(0.f, 1.f, 0.f-FieldUVOffset, 1.f-FieldUVOffset);
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Needs to be called *before* ApplyCachedRenderTargets, since BeginRenderPass is caching the render targets.
 		RHICmdList.BeginRenderPass(RPInfo, TEXT("NDI Recv Color Conversion"));
@@ -1252,13 +1205,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrame(FRHICommandListImmedi
 		GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 		// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION == 5
 		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// set the stream source
 		RHICmdList.SetStreamSource(0, VertexBuffer, 0);
@@ -1312,7 +1259,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrameAlpha(FRHICommandListI
 
 			// Update the shader resource for the 'SourceTexture'
 			// The source texture will be given UYVY data, so make it half-width
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 1))	// 5.1 or later
 			const FRHITextureCreateDesc CreateDesc = FRHITextureCreateDesc::Create2D(TEXT("NDIMediaReceiverInterlacedAlphaSourceTexture"))
 				.SetExtent(FieldSize.X / 2, FieldSize.Y)
 				.SetFormat(PF_B8G8R8A8)
@@ -1328,7 +1275,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrameAlpha(FRHICommandListI
 				.SetFlags(ETextureCreateFlags::RenderTargetable | ETextureCreateFlags::Dynamic);
 
 			SourceAlphaTexture = RHICreateTexture(CreateAlphaDesc);
-#elif (ENGINE_MAJOR_VERSION == 4) || (ENGINE_MAJOR_VERSION == 5)
+#elif (ENGINE_MAJOR_VERSION == 5)
 			FRHIResourceCreateInfo CreateInfo(TEXT("NDIMediaReceiverInterlacedAlphaSourceTexture"));
 			TRefCountPtr<FRHITexture2D> DummyTexture2DRHI;
 			RHICreateTargetableShaderResource2D(FieldSize.X/2, FieldSize.Y, PF_B8G8R8A8, 1, TexCreate_Dynamic,
@@ -1349,13 +1296,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrameAlpha(FRHICommandListI
 			DrawMode = EDrawMode::InterlacedAlpha;
 		}
 
-#if ENGINE_MAJOR_VERSION >= 5
 		TargetableTexture = RenderTarget->GetRHI();
-#elif ENGINE_MAJOR_VERSION == 4
-		TargetableTexture = RenderTarget->GetRenderTargetItem().TargetableTexture;
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Initialize the Graphics Pipeline State Object
 		FGraphicsPipelineStateInitializer GraphicsPSOInit;
@@ -1372,13 +1313,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrameAlpha(FRHICommandListI
 		TShaderMapRef<FNDIIOShaderUYVAtoBGRAPS> ConvertShader(ShaderMap);
 
 		float FieldUVOffset = (Result.frame_format_type == NDIlib_frame_format_type_field_1) ? 0.5f/Result.yres : 0.f;
-#if ENGINE_MAJOR_VERSION == 5
 		FBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer(0.f, 1.f, 0.f-FieldUVOffset, 1.f-FieldUVOffset);
-#elif ENGINE_MAJOR_VERSION == 4
-		FVertexBufferRHIRef VertexBuffer = CreateTempMediaVertexBuffer(0.f, 1.f, 0.f-FieldUVOffset, 1.f-FieldUVOffset);
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// Needs to be called *before* ApplyCachedRenderTargets, since BeginRenderPass is caching the render targets.
 		RHICmdList.BeginRenderPass(RPInfo, TEXT("NDI Recv Color Conversion"));
@@ -1399,13 +1334,7 @@ FTextureRHIRef UNDIMediaReceiver::DrawInterlacedVideoFrameAlpha(FRHICommandListI
 		GraphicsPSOInit.PrimitiveType = PT_TriangleStrip;
 
 		// Ensure the pipeline state is set to the one we've configured
-#if ENGINE_MAJOR_VERSION == 5
 		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit, 0);
-#elif ENGINE_MAJOR_VERSION == 4
-		SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
-#else
-		#error "Unsupported engine major version"
-#endif
 
 		// set the stream source
 		RHICmdList.SetStreamSource(0, VertexBuffer, 0);
@@ -1573,14 +1502,7 @@ bool UNDIMediaReceiver::HasMediaOption(const FName& Key) const
 FTextureResource* UNDIMediaReceiver::GetVideoTextureResource() const
 {
 	if(IsValid(this->VideoTexture))
-#if ENGINE_MAJOR_VERSION == 5
 		return this->VideoTexture->GetResource();
-#elif ENGINE_MAJOR_VERSION == 4
-		return this->VideoTexture->Resource;
-#else
-		#error "Unsupported engine major version"
-		return nullptr;
-#endif
 
 	return nullptr;
 }
@@ -1588,14 +1510,7 @@ FTextureResource* UNDIMediaReceiver::GetVideoTextureResource() const
 FTextureResource* UNDIMediaReceiver::GetInternalVideoTextureResource() const
 {
 	if(IsValid(this->InternalVideoTexture))
-#if ENGINE_MAJOR_VERSION == 5
 		return this->InternalVideoTexture->GetResource();
-#elif ENGINE_MAJOR_VERSION == 4
-		return this->InternalVideoTexture->Resource;
-#else
-		#error "Unsupported engine major version"
-		return nullptr;
-#endif
 
 	return nullptr;
 }

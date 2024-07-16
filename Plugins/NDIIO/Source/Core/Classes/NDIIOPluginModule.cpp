@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -37,11 +37,6 @@
 #define LOCTEXT_NAMESPACE "FNDIIOPluginModule"
 
 
-#if ENGINE_MAJOR_VERSION == 4
-#define PLATFORM_LINUXARM64 PLATFORM_LINUXAARCH64
-#endif
-
-
 void FNDIIOPluginModule::StartupModule()
 {
 	// Doubly Ensure that this handle is nullptr
@@ -54,8 +49,8 @@ void FNDIIOPluginModule::StartupModule()
 		if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 		{
 			SettingsModule->RegisterSettings(
-				"Project", "Plugins", "NDI", LOCTEXT("NDISettingsName", "NewTek NDI"),
-				LOCTEXT("NDISettingsDescription", "NewTek NDI Engine Intergration Settings"),
+				"Project", "Plugins", "NDI", LOCTEXT("NDISettingsName", "Vizrt NDI"),
+				LOCTEXT("NDISettingsDescription", "Vizrt NDI(R) Engine Intergration Settings"),
 				GetMutableDefault<UNDIIOPluginSettings>());
 		}
 
@@ -65,7 +60,7 @@ void FNDIIOPluginModule::StartupModule()
 
 #endif
 
-		// Construct out Services
+		// Construct our Services
 		this->NDIFinderService = MakeShareable(new FNDIFinderService());
 		this->NDIConnectionService = MakeShareable(new FNDIConnectionService());
 
@@ -82,13 +77,13 @@ void FNDIIOPluginModule::StartupModule()
 #if PLATFORM_WINDOWS
 		// Write an error message to the log.
 		UE_LOG(LogWindows, Error,
-			   TEXT("Unable to load \"Processing.NDI.Lib.x64.dll\" from the NDI 5 Runtime Directory."));
+			   TEXT("Unable to load \"Processing.NDI.Lib.x64.dll\" from the NDI 6 Runtime Directory."));
 
 #if UE_EDITOR
 
 		const FText& WarningMessage =
 			LOCTEXT("NDIRuntimeMissing",
-					"Cannot find \"Processing.NDI.Lib.x64.dll\" from the NDI 5 Runtime Directory. "
+					"Cannot find \"Processing.NDI.Lib.x64.dll\" from the NDI 6 Runtime Directory. "
 					"Continued usage of the plugin can cause instability within the editor.\r\n\r\n"
 
 					"Please refer to the 'NDI IO Plugin for Unreal Engine Quickstart Guide' "
@@ -107,13 +102,13 @@ void FNDIIOPluginModule::StartupModule()
 #if (PLATFORM_LINUX || PLATFORM_LINUXARM64)
 		// Write an error message to the log.
 		UE_LOG(LogLinux, Error,
-			   TEXT("Unable to load \"" NDILIB_LIBRARY_NAME "\" from the NDI 5 Runtime."));
+			   TEXT("Unable to load \"" NDILIB_LIBRARY_NAME "\" from the NDI 6 Runtime."));
 
 #if UE_EDITOR
 
 		const FText& WarningMessage =
 			LOCTEXT("NDIRuntimeMissing",
-					"Cannot find \"" NDILIB_LIBRARY_NAME "\" from the NDI 5 Runtime. "
+					"Cannot find \"" NDILIB_LIBRARY_NAME "\" from the NDI 6 Runtime. "
 					"Continued usage of the plugin can cause instability within the editor.\r\n\r\n"
 
 					"Please refer to the 'NDI IO Plugin for Unreal Engine Quickstart Guide' "

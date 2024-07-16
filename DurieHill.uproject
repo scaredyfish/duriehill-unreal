@@ -94,10 +94,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "WmfMedia",
-			"Enabled": false
-		},
-		{
 			"Name": "WindowsMoviePlayer",
 			"Enabled": false
 		},

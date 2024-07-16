@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -15,19 +15,18 @@
 #include <Actors/NDIReceiveActor.h>
 #include <Actors/NDIBroadcastActor.h>
 
-#include "Framework/Application/SlateApplication.h"
+#include <Framework/Application/SlateApplication.h>
 
 #include <Misc/EngineVersionComparison.h>
 
 #include "Widgets/NDIWidgets.h"
-#include "PropertyEditorModule.h"
 
 
 #define LOCTEXT_NAMESPACE "FNDIEditorModule"
 #define IMAGE_BRUSH(RelativePath, ...) FSlateImageBrush(StyleInstance->RootToContentDir(RelativePath, TEXT(".png")), __VA_ARGS__)
 
-#define PLACEMENT_CATEGORY TEXT("NDI�")
-#define PLACEMENT_LOCTEXT NSLOCTEXT("NewTek", "NDI", "NDI�")
+#define PLACEMENT_CATEGORY TEXT("NDI(R)")
+#define PLACEMENT_LOCTEXT NSLOCTEXT("Vizrt", "NDI", "NDI(R)")
 #define PLACEMENT_TEXT TEXT("PMNDI")
 
 void FNDIIOEditorModule::StartupModule()
@@ -78,7 +77,6 @@ void FNDIIOEditorModule::StartupModule()
 	// Get the Registered Placement Category
 	if (const FPlacementCategoryInfo* PlacementCategoryInformation = PlacementModeModule.GetRegisteredPlacementCategory(CategoryName))
 	{
-#if ENGINE_MAJOR_VERSION == 5
 		// Register the NDI Broadcast Actor a placeable item within the editor
 		PlacementModeModule.RegisterPlaceableItem(PlacementCategoryInformation->UniqueHandle, MakeShareable(
 			new FPlaceableItem(
@@ -88,7 +86,7 @@ void FNDIIOEditorModule::StartupModule()
 				NAME_None,
 				TOptional<FLinearColor>(),
 				10,
-				NSLOCTEXT("NewTek", "NDIBroadcastActor", "NDI Broadcast Actor")
+				NSLOCTEXT("Vizrt", "NDIBroadcastActor", "NDI Broadcast Actor")
 			))
 		);
 
@@ -101,28 +99,9 @@ void FNDIIOEditorModule::StartupModule()
 				NAME_None,
 				TOptional<FLinearColor>(),
 				20,
-				NSLOCTEXT("NewTek", "NDIReceiveActor", "NDI Receive Actor")
+				NSLOCTEXT("Vizrt", "NDIReceiveActor", "NDI Receive Actor")
 			))
 		);
-#elif ENGINE_MAJOR_VERSION == 4
-		// Register the NDI Broadcast Actor a placeable item within the editor
-		PlacementModeModule.RegisterPlaceableItem(
-			PlacementCategoryInformation->UniqueHandle,
-			MakeShareable(new FPlaceableItem(*UActorFactory::StaticClass(),
-											 FAssetData(ANDIBroadcastActor::StaticClass()->ClassDefaultObject),
-											 FName("ClassThumbnail.NDIBroadcastActor"), TOptional<FLinearColor>(), 10,
-											 NSLOCTEXT("NewTek", "NDIBroadcastActor", "NDI Broadcast Actor"))));
-
-		// Register the NDI Receive Actor a placeable item within the editor
-		PlacementModeModule.RegisterPlaceableItem(
-			PlacementCategoryInformation->UniqueHandle,
-			MakeShareable(new FPlaceableItem(*UActorFactory::StaticClass(),
-											 FAssetData(ANDIReceiveActor::StaticClass()->ClassDefaultObject),
-											 FName("ClassThumbnail.NDIReceiveActor"), TOptional<FLinearColor>(), 20,
-											 NSLOCTEXT("NewTek", "NDIReceiveActor", "NDI Receive Actor"))));
-#else
-		#error "Unsupported engine major version"
-#endif
 	}
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");

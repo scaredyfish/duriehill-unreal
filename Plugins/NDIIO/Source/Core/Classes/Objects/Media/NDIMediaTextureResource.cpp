@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -11,6 +11,7 @@
 #include <DeviceProfiles/DeviceProfile.h>
 #include <DeviceProfiles/DeviceProfileManager.h>
 #include <Objects/Media/NDIMediaTexture2D.h>
+#include <RenderUtils.h>
 
 /**
 	Constructs a new instance of this object specifying a media texture owner
@@ -22,7 +23,7 @@ FNDIMediaTextureResource::FNDIMediaTextureResource(UNDIMediaTexture2D* Owner)
 	this->MediaTexture = Owner;
 }
 
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 void FNDIMediaTextureResource::InitRHI(FRHICommandListBase& RHICmdList)
 #else
 void FNDIMediaTextureResource::InitDynamicRHI()
@@ -39,7 +40,7 @@ void FNDIMediaTextureResource::InitDynamicRHI()
 	}
 }
 
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 void FNDIMediaTextureResource::ReleaseRHI()
 #else
 void FNDIMediaTextureResource::ReleaseDynamicRHI()

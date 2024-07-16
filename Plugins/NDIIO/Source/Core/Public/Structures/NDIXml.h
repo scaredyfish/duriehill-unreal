@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -86,7 +86,7 @@ public:
 			return (*ParserPtr)->ProcessOpen(ElementName, ElementData);
 		}
 
-		return false;
+		//return false;
 	}
 
 	virtual bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override
@@ -99,6 +99,8 @@ public:
 		{
 			return ElementParserStack.Last()->ProcessAttribute(AttributeName, AttributeValue);
 		}
+
+		//return false;
 	}
 
 	virtual bool ProcessClose(const TCHAR* ElementName) override
@@ -113,7 +115,7 @@ public:
 			return Parser->ProcessClose(ElementName);
 		}
 
-		return false;
+		//return false;
 	}
 
 	virtual bool ProcessComment(const TCHAR* Comment) override

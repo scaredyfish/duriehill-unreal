@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 7,
-	"VersionName": "3.4",
+	"Version": 9,
+	"VersionName": "3.6",
 	"FriendlyName": "NDI IO Plugin",
 	"Description": "Exposes Core NDI Support for integration into Unreal Engine Applications",
 	"Category": "Virtual Production",

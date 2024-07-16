@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -11,7 +11,7 @@
 #include <Engine/TextureRenderTarget2D.h>
 #include <AudioDevice.h>
 #include <Misc/EngineVersionComparison.h>
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 #include <ISubmixBufferListener.h>
 #endif
 #include <Widgets/SWindow.h>
@@ -27,6 +27,7 @@ class NDIIO_API FNDIConnectionService final : public ISubmixBufferListener
 {
 public:
 	static FNDIConnectionServiceSendVideoEvent EventOnSendVideoFrame;
+private:
 	static FNDIConnectionServiceSendAudioEvent EventOnSendAudioFrame;
 
 public:
@@ -49,11 +50,29 @@ public:
 		return bIsInPIEMode;
 	}
 
+	template <typename UserClass>
+	static void AddAudioSender(UserClass* InUserObject, typename TMemFunPtrType<false, UserClass, void (int64 /*time_code*/, float* /*AudioData*/, int32 /*NumSamples*/, int32 /*NumChannels*/, const int32 /*SampleRate*/, double /*AudioClock*/)>::Type InFunc)
+	{
+		FScopeLock Lock(&AudioSyncContext);
+		FNDIConnectionService::EventOnSendAudioFrame.AddUObject(InUserObject, InFunc);
+	}
+
+	template <typename UserClass>
+	static void RemoveAudioSender(UserClass* InUserObject)
+	{
+		FScopeLock Lock(&AudioSyncContext);
+		FNDIConnectionService::EventOnSendAudioFrame.RemoveAll(InUserObject);
+	}
+
 private:
 	// Handler for when the render thread frame has ended
 	void OnEndRenderFrame();
 
-	void OnFEngineLoopInitComplete();
+	void BeginAudioCapture();
+	void StopAudioCapture();
+
+	void OnPostEngineInit();
+	void OnEnginePreExit();
 
 	// Handler for when the active viewport back buffer is about to be resized
 	void OnActiveViewportBackbufferPreResize(void* Backbuffer);
@@ -64,7 +83,9 @@ private:
 	FTextureResource* GetVideoTextureResource() const;
 
 	virtual void OnNewSubmixBuffer(const USoundSubmix* OwningSubmix, float* AudioData, int32 NumSamples, int32 NumChannels, const int32 SampleRate, double AudioClock) override final;
-
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 4))	// 5.4 or later
+	virtual const FString& GetListenerName() const override final;
+#endif
 
 private:
 	bool bIsInitialized = false;
@@ -72,8 +93,8 @@ private:
 	bool bIsBroadcastingActiveViewport = false;
 	bool bIsInPIEMode = false;
 
-	FCriticalSection AudioSyncContext;
-	FCriticalSection RenderSyncContext;
+	static FCriticalSection AudioSyncContext;
+	static FCriticalSection RenderSyncContext;
 
 	UTextureRenderTarget2D* VideoTexture = nullptr;
 	class UNDIMediaSender* ActiveViewportSender = nullptr;

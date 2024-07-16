@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -26,15 +26,8 @@ BEGIN_GLOBAL_SHADER_PARAMETER_STRUCT(FNDIIOShaderUB, )
 	SHADER_PARAMETER(uint32, InputHeight)
 	SHADER_PARAMETER(uint32, OutputWidth)
 	SHADER_PARAMETER(uint32, OutputHeight)
-#if ENGINE_MAJOR_VERSION == 5
 	SHADER_PARAMETER(FVector2f, UVOffset)
 	SHADER_PARAMETER(FVector2f, UVScale)
-#elif ENGINE_MAJOR_VERSION == 4
-	SHADER_PARAMETER(FVector2D, UVOffset)
-	SHADER_PARAMETER(FVector2D, UVScale)
-#else
-	#error "Unsupported engine major version"
-#endif
 	SHADER_PARAMETER(uint32, ColorCorrection)
 	SHADER_PARAMETER(float, AlphaScale)
 	SHADER_PARAMETER(float, AlphaOffset)
@@ -64,15 +57,8 @@ void FNDIIOShaderPS::SetParameters(FRHICommandList& CommandList, const Params& p
 		UB.InputHeight = params.InputTarget->GetSizeY();
 		UB.OutputWidth = params.OutputSize.X;
 		UB.OutputHeight = params.OutputSize.Y;
-#if ENGINE_MAJOR_VERSION == 5
 		UB.UVOffset = static_cast<FVector2f>(params.UVOffset);
 		UB.UVScale = static_cast<FVector2f>(params.UVScale);
-#elif ENGINE_MAJOR_VERSION == 4
-		UB.UVOffset = params.UVOffset;
-		UB.UVScale = params.UVScale;
-#else
-		#error "Unsupported engine major version"
-#endif
 		UB.ColorCorrection = static_cast<uint32>(params.ColorCorrection);
 
 		/*
@@ -102,7 +88,7 @@ void FNDIIOShaderPS::SetParameters(FRHICommandList& CommandList, const Params& p
 	}
 
 	TUniformBufferRef<FNDIIOShaderUB> Data = TUniformBufferRef<FNDIIOShaderUB>::CreateUniformBufferImmediate(UB, UniformBuffer_SingleFrame);
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 	FRHIBatchedShaderParameters& BatchedParameters = CommandList.GetScratchShaderParameters();
 	SetUniformBufferParameter(BatchedParameters, GetUniformBufferParameter<FNDIIOShaderUB>(), Data);
 	CommandList.SetBatchedShaderParameters(CommandList.GetBoundPixelShader(), BatchedParameters);

@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -277,6 +277,8 @@ private:
 
 	FTextureResource* GetRenderTargetResource() const;
 
+	void PrepareDefaultTexture();
+
 private:
 	std::atomic<bool> bIsChangingBroadcastSize { false };
 
@@ -301,6 +303,7 @@ private:
 		FTexture2DRHIRef Texture = nullptr;
 		void* pData = nullptr;
 		std::string MetaData;
+		FIntPoint FrameSize;
 
 	public:
 		~MappedTexture();
@@ -312,12 +315,15 @@ private:
 
 		void Resolve(FRHICommandListImmediate& RHICmdList, FRHITexture* SourceTextureRHI, const FResolveRect& Rect = FResolveRect(), const FResolveRect& DestRect = FResolveRect());
 
-		void Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight);
+		void Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight, int32& OutLineStride);
 		void* MappedData() const;
 		void Unmap(FRHICommandListImmediate& RHICmdList);
 
 		void AddMetaData(const FString& Data);
 		const std::string& GetMetaData() const;
+
+	private:
+		void PrepareTexture();
 	};
 
 	/**
@@ -330,7 +336,7 @@ private:
 	class MappedTextureASyncSender
 	{
 	private:
-		MappedTexture MappedTextures[2];
+		MappedTexture MappedTextures[4];
 		int32 CurrentIndex = 0;
 
 	public:
@@ -341,7 +347,7 @@ private:
 
 		void Resolve(FRHICommandListImmediate& RHICmdList, FRHITexture* SourceTextureRHI, const FResolveRect& Rect = FResolveRect(), const FResolveRect& DestRect = FResolveRect());
 
-		void Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight);
+		void Map(FRHICommandListImmediate& RHICmdList, int32& OutWidth, int32& OutHeight, int32& OutLineStride);
 		void Send(FRHICommandListImmediate& RHICmdList, NDIlib_send_instance_t p_send_instance, NDIlib_video_frame_v2_t& p_video_data);
 		void Flush(FRHICommandListImmediate& RHICmdList, NDIlib_send_instance_t p_send_instance);
 

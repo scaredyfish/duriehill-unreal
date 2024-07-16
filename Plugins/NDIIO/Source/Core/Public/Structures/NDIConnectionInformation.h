@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -14,7 +14,7 @@
 #include "NDIConnectionInformation.generated.h"
 
 /**
-	Describes essential properties used for connection objects over NDI®
+	Describes essential properties used for connection objects over NDI
 */
 USTRUCT(BlueprintType, Blueprintable, Category = "NDI IO", META = (DisplayName = "NDI Connection Information"))
 struct NDIIO_API FNDIConnectionInformation

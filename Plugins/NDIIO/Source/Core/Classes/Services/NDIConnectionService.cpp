@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -15,6 +15,7 @@
 #include <Framework/Application/SlateApplication.h>
 #include <Misc/EngineVersionComparison.h>
 #include <Engine/Engine.h>
+#include <TextureResource.h>
 
 #if WITH_EDITOR
 
@@ -26,6 +27,10 @@
 
 FNDIConnectionServiceSendVideoEvent FNDIConnectionService::EventOnSendVideoFrame;
 FNDIConnectionServiceSendAudioEvent FNDIConnectionService::EventOnSendAudioFrame;
+
+
+FCriticalSection FNDIConnectionService::AudioSyncContext;
+FCriticalSection FNDIConnectionService::RenderSyncContext;
 
 /** ************************ **/
 
@@ -81,31 +86,35 @@ bool FNDIConnectionService::Start()
 		this->ActiveViewportSender->ChangeVideoTexture(VideoTexture);
 		this->ActiveViewportSender->ChangeBroadcastConfiguration(Configuration);
 
-		// Hook into the GEngine finishing initialization
-		FCoreDelegates::OnFEngineLoopInitComplete.AddRaw(this, &FNDIConnectionService::OnFEngineLoopInitComplete);
-
 		// Hook into the core for the end of frame handlers
 		FCoreDelegates::OnEndFrameRT.AddRaw(this, &FNDIConnectionService::OnEndRenderFrame);
 
+		if (!GIsEditor)
+		{
+			FCoreDelegates::OnPostEngineInit.AddRaw(this, &FNDIConnectionService::OnPostEngineInit);
+			FCoreDelegates::OnEnginePreExit.AddRaw(this, &FNDIConnectionService::OnEnginePreExit);
+			if (bBeginBroadcastOnPlay)
+				BeginBroadcastingActiveViewport();
+		}
 #if WITH_EDITOR
+		else
+		{
+			FEditorDelegates::PostPIEStarted.AddLambda([this](const bool Success) {
+				if (auto* CoreSettings = NewObject<UNDIIOPluginSettings>())
+				{
+					if (CoreSettings->bBeginBroadcastOnPlay == true)
+						BeginBroadcastingActiveViewport();
+					else
+						BeginAudioCapture();
 
-		FEditorDelegates::BeginPIE.AddLambda([this](const bool Success) {
-			if (auto* CoreSettings = NewObject<UNDIIOPluginSettings>())
-			{
-				if (CoreSettings->bBeginBroadcastOnPlay == true)
-					BeginBroadcastingActiveViewport();
-
-				// clean-up the settings object
-				CoreSettings->ConditionalBeginDestroy();
-				CoreSettings = nullptr;
-			}
-			bIsInPIEMode = true;
-		});
-		FEditorDelegates::PrePIEEnded.AddLambda([this](const bool Success) { StopBroadcastingActiveViewport(); });
-
-#else
-		if (bBeginBroadcastOnPlay)
-			BeginBroadcastingActiveViewport();
+					// clean-up the settings object
+					CoreSettings->ConditionalBeginDestroy();
+					CoreSettings = nullptr;
+				}
+				bIsInPIEMode = true;
+			});
+			FEditorDelegates::PrePIEEnded.AddLambda([this](const bool Success) { StopBroadcastingActiveViewport(); });
+		}
 #endif
 	}
 
@@ -122,18 +131,7 @@ void FNDIConnectionService::Shutdown()
 	// reset the initialization properties
 	bIsInitialized = false;
 
-	if (bIsAudioInitialized)
-	{
-		if (GEngine)
-		{
-			FAudioDeviceHandle AudioDevice = GEngine->GetMainAudioDevice();
-			if (AudioDevice)
-			{
-				AudioDevice->UnregisterSubmixBufferListener(this);
-			}
-		}
-		bIsAudioInitialized = false;
-	}
+	StopAudioCapture();
 
 	// unbind our handlers for our frame events
 	FCoreDelegates::OnEndFrame.RemoveAll(this);
@@ -160,7 +158,7 @@ void FNDIConnectionService::OnEndRenderFrame()
 	}
 }
 
-void FNDIConnectionService::OnFEngineLoopInitComplete()
+void FNDIConnectionService::BeginAudioCapture()
 {
 	if (bIsInitialized)
 	{
@@ -168,13 +166,46 @@ void FNDIConnectionService::OnFEngineLoopInitComplete()
 		{
 			if (GEngine)
 			{
-				FAudioDeviceHandle AudioDevice = GEngine->GetMainAudioDevice();
+				FAudioDeviceHandle AudioDevice = GEngine->GetActiveAudioDevice();
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 4))	// 5.4 or later
+				AudioDevice->RegisterSubmixBufferListener(AsShared(), AudioDevice->GetMainSubmixObject());
+#else
 				AudioDevice->RegisterSubmixBufferListener(this);
-
+#endif
 				bIsAudioInitialized = true;
 			}
 		}
 	}
+}
+
+void FNDIConnectionService::StopAudioCapture()
+{
+	if (bIsAudioInitialized)
+	{
+		if (GEngine)
+		{
+			FAudioDeviceHandle AudioDevice = GEngine->GetActiveAudioDevice();
+			if (AudioDevice)
+			{
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 4))	// 5.4 or later
+				AudioDevice->UnregisterSubmixBufferListener(AsShared(), AudioDevice->GetMainSubmixObject());
+#else
+				AudioDevice->UnregisterSubmixBufferListener(this);
+#endif
+			}
+		}
+		bIsAudioInitialized = false;
+	}
+}
+
+void FNDIConnectionService::OnPostEngineInit()
+{
+	BeginAudioCapture();
+}
+
+void FNDIConnectionService::OnEnginePreExit()
+{
+	StopAudioCapture();
 }
 
 bool FNDIConnectionService::BeginBroadcastingActiveViewport()
@@ -223,6 +254,8 @@ bool FNDIConnectionService::BeginBroadcastingActiveViewport()
 			this, &FNDIConnectionService::OnActiveViewportBackbufferPreResize);
 		FSlateApplication::Get().GetRenderer()->OnBackBufferReadyToPresent().AddRaw(
 			this, &FNDIConnectionService::OnActiveViewportBackbufferReadyToPresent);
+
+		BeginAudioCapture();
 	}
 
 	// always return true
@@ -284,18 +317,7 @@ void FNDIConnectionService::StopBroadcastingActiveViewport()
 	// reset the initialization properties
 	bIsInPIEMode = false;
 
-	if (bIsAudioInitialized)
-	{
-		if (GEngine)
-		{
-			FAudioDeviceHandle AudioDevice = GEngine->GetMainAudioDevice();
-			if (AudioDevice)
-			{
-				AudioDevice->UnregisterSubmixBufferListener(this);
-			}
-		}
-		bIsAudioInitialized = false;
-	}
+	StopAudioCapture();
 
 	// Ensure that if the active viewport sender is active, that we shut it down
 	if (IsValid(this->ActiveViewportSender))
@@ -322,14 +344,7 @@ void FNDIConnectionService::StopBroadcastingActiveViewport()
 FTextureResource* FNDIConnectionService::GetVideoTextureResource() const
 {
 	if(IsValid(this->VideoTexture))
-#if ENGINE_MAJOR_VERSION == 5
 		return this->VideoTexture->GetResource();
-#elif ENGINE_MAJOR_VERSION == 4
-		return this->VideoTexture->Resource;
-#else
-		#error "Unsupported engine major version"
-		return nullptr;
-#endif
 
 	return nullptr;
 }
@@ -352,3 +367,11 @@ void FNDIConnectionService::OnNewSubmixBuffer(const USoundSubmix* OwningSubmix, 
 		}
 	}
 }
+
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 4))	// 5.4 or later
+const FString& FNDIConnectionService::GetListenerName() const
+{
+	static const FString ListenerName(TEXT("NDIConnectionServiceListener"));
+	return ListenerName;
+}
+#endif

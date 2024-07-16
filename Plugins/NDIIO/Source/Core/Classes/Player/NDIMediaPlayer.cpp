@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2023 Vizrt NDI AB. All rights reserved.
+	Copyright (C) 2024 Vizrt NDI AB. All rights reserved.
 
 	This file and it's use within a Product is bound by the terms of NDI SDK license that was provided
 	as part of the NDI SDK. For more information, please review the license and the NDI SDK documentation.
@@ -10,14 +10,17 @@
 
 #include <MediaIOCoreSamples.h>
 #include <MediaIOCoreTextureSampleBase.h>
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
+#include <MediaIOCoreTextureSampleConverter.h>
+#endif
 #include <MediaIOCoreAudioSampleBase.h>
 #include <IMediaEventSink.h>
 #include <IMediaTextureSampleConverter.h>
 #include <Misc/EngineVersionComparison.h>
 
 
-
 #define LOCTEXT_NAMESPACE "FNDIMediaPlayer"
+
 
 
 // An NDI-derived media texture sample, representing a frame of video
@@ -27,46 +30,52 @@ class NDIMediaTextureSample : public FMediaIOCoreTextureSampleBase, public IMedi
 
 public:
 
+	NDIMediaTextureSample() = default;
+	virtual ~NDIMediaTextureSample() = default;
+
 	bool Initialize(const NDIlib_video_frame_v2_t& InVideoFrame, FTimespan InTime, UNDIMediaReceiver* InReceiver)
 	{
+		FreeSample();
+
 		VideoFrame = InVideoFrame;
 		Receiver = InReceiver;
-		Time = (FMediaTimeStamp)InTime;
 
 		if (InVideoFrame.FourCC == NDIlib_FourCC_video_type_UYVY)
-			Data.assign(InVideoFrame.p_data, InVideoFrame.p_data + InVideoFrame.line_stride_in_bytes * InVideoFrame.yres);
+			SetBuffer(InVideoFrame.p_data, InVideoFrame.line_stride_in_bytes * InVideoFrame.yres);
 		else if (InVideoFrame.FourCC == NDIlib_FourCC_video_type_UYVA)
-			Data.assign(InVideoFrame.p_data, InVideoFrame.p_data + InVideoFrame.line_stride_in_bytes * InVideoFrame.yres +
-			                                                       InVideoFrame.xres*InVideoFrame.yres);
+			SetBuffer(InVideoFrame.p_data, InVideoFrame.line_stride_in_bytes * InVideoFrame.yres +
+			                               InVideoFrame.xres*InVideoFrame.yres);
 		else
 			return false;
 
-		VideoFrame.p_data = Data.data();
+		VideoFrame.p_data = Buffer.GetData();
+
+		SetProperties(InVideoFrame.line_stride_in_bytes, InVideoFrame.xres, InVideoFrame.yres, EMediaTextureSampleFormat::CharUYVY,
+			InTime, FFrameRate(InVideoFrame.frame_rate_N, InVideoFrame.frame_rate_D), FTimecode(),
+			true);
 
 		return true;
 	}
 
+#if 0
 	virtual EMediaTextureSampleFormat GetFormat() const override
 	{
 		return EMediaTextureSampleFormat::CharBGRA;
 	}
-
+#endif
+#if 0
 	virtual bool IsOutputSrgb() const override
 	{
 		return false;
 	}
-
+#endif
+#if 1
 	virtual const FMatrix& GetYUVToRGBMatrix() const override
 	{
-#if ENGINE_MAJOR_VERSION == 5
 		return MediaShaders::YuvToRgbRec709Scaled;
-#elif ENGINE_MAJOR_VERSION == 4
-		return MediaShaders::YuvToRgbRec709Full;
-#else
-		#error "Unsupported engine major version"
-#endif
 	}
-
+#endif
+#if 0
 	virtual FLinearColor GetScaleRotation() const override
 	{
 		// Note that there appears to be a bug in the Unreal Engine where having
@@ -74,56 +83,149 @@ public:
 		// sample is drawn more than once.
 		return Super::GetScaleRotation();
 	}
-
+#endif
+#if 0
 	virtual FIntPoint GetDim() const override
 	{
 		return FIntPoint(VideoFrame.xres, VideoFrame.yres);
 	}
-
+#endif
+#if 0
 	virtual FIntPoint GetOutputDim() const override
 	{
 		return FIntPoint(VideoFrame.xres, VideoFrame.yres);
 	}
-
+#endif
+#if 0
 	virtual uint32 GetStride() const override
 	{
 		return VideoFrame.line_stride_in_bytes;
 	}
-
+#endif
+#if 0
 	virtual FMediaTimeStamp GetTime() const override
 	{
 		return Time;
 	}
-
+#endif
+#if 0
 	virtual FTimespan GetDuration() const override
 	{
 		return ETimespan::TicksPerSecond * FFrameRate(VideoFrame.frame_rate_N, VideoFrame.frame_rate_D).AsInterval();
 	}
-
+#endif
+#if 0
 	virtual IMediaTextureSampleConverter* GetMediaTextureSampleConverter() override
 	{
 		return this;
 	}
+#endif
+#if 0
+	virtual IMediaTextureSampleColorConverter* GetMediaTextureSampleColorConverter() override
+	{
+		return nullptr;
+	}
+#endif
+#if 0
+	virtual bool IsCacheable() const override
+	{
+		return false;
+	}
+#endif
 
-	uint32 GetConverterInfoFlags() const
+#if 0
+	virtual void Setup(const TSharedPtr<FMediaIOCoreTextureSampleBase>& InSample) override
+	{
+		FMediaIOCoreTextureSampleConverter::Setup(InSample);
+	}
+
+	virtual uint32 GetConverterInfoFlags() const override
+	{
+		//return ConverterInfoFlags_WillCreateOutputTexture;// | FMediaIOCoreTextureSampleConverter::GetConverterInfoFlags();
+		return FMediaIOCoreTextureSampleConverter::GetConverterInfoFlags();
+	}
+#endif
+
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
+	virtual void CopyConfiguration(const TSharedPtr<FMediaIOCoreTextureSampleBase>& SourceSample) override
+	{
+		Super::CopyConfiguration(SourceSample);
+
+		if (SourceSample.IsValid())
+		{
+			TSharedPtr<NDIMediaTextureSample> NDISamplePtr = StaticCastSharedPtr<NDIMediaTextureSample>(SourceSample);
+			VideoFrame = NDISamplePtr->VideoFrame;
+			Receiver = NDISamplePtr->Receiver;
+		}
+	}
+#endif
+
+#if 1
+	virtual uint32 GetConverterInfoFlags() const override
 	{
 		return ConverterInfoFlags_WillCreateOutputTexture;
 	}
 
 	virtual bool Convert(FTexture2DRHIRef & InDstTexture, const FConversionHints & Hints) override
 	{
+		if (!Receiver)
+			return false;
+
 		FTexture2DRHIRef DstTexture(Receiver->DisplayFrame(VideoFrame));
 		InDstTexture = DstTexture;
 
 		return true;
 	}
+#endif
 
 private:
 	NDIlib_video_frame_v2_t VideoFrame;
 	UNDIMediaReceiver* Receiver { nullptr };
-	FMediaTimeStamp Time;
-	std::vector<uint8_t> Data;
+	//FMediaTimeStamp Time;
+	//std::vector<uint8_t> Data;
 };
+
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
+class NDIMediaTextureSampleConverter : public FMediaIOCoreTextureSampleConverter
+{
+	using Super = FMediaIOCoreTextureSampleConverter;
+
+public:
+
+	NDIMediaTextureSampleConverter() = default;
+	virtual ~NDIMediaTextureSampleConverter() = default;
+
+	virtual void Setup(const TSharedPtr<FMediaIOCoreTextureSampleBase>& InSample) override
+	{
+		FMediaIOCoreTextureSampleConverter::Setup(InSample);
+		JITRProxySample = InSample;
+	}
+
+	virtual uint32 GetConverterInfoFlags() const override
+	{
+		return ConverterInfoFlags_WillCreateOutputTexture;
+	}
+
+	virtual bool Convert(FTexture2DRHIRef & InDstTexture, const FConversionHints & Hints) override
+	{
+		if (FMediaIOCoreTextureSampleConverter::Convert(InDstTexture, Hints))
+		{
+			TSharedPtr<FMediaIOCoreTextureSampleBase> SamplePtr = JITRProxySample.Pin();
+			if (SamplePtr.IsValid())
+			{
+				TSharedPtr<NDIMediaTextureSample> NDISamplePtr = StaticCastSharedPtr<NDIMediaTextureSample>(SamplePtr);
+				return NDISamplePtr->Convert(InDstTexture, Hints);
+			}
+		}
+
+		return false;
+	}
+
+private:
+	TWeakPtr<FMediaIOCoreTextureSampleBase> JITRProxySample;
+};
+#endif
+
 
 class NDIMediaTextureSamplePool : public TMediaObjectPool<NDIMediaTextureSample>
 {};
@@ -347,7 +449,11 @@ void FNDIMediaPlayer::DisplayFrame(const NDIlib_video_frame_v2_t& video_frame)
 
 	if (TextureSample->Initialize(video_frame, FTimespan::FromSeconds(GetPlatformSeconds()), Receiver))
 	{
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
+		AddVideoSample(TextureSample);
+#else
 		Samples->AddVideo(TextureSample);
+#endif
 	}
 }
 
@@ -417,10 +523,15 @@ void FNDIMediaPlayer::SetupSampleChannels()
 }
 
 
-#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))
+#if (ENGINE_MAJOR_VERSION > 5) || ((ENGINE_MAJOR_VERSION == 5) && (ENGINE_MINOR_VERSION >= 3))	// 5.3 or later
 TSharedPtr<FMediaIOCoreTextureSampleBase> FNDIMediaPlayer::AcquireTextureSample_AnyThread() const
 {
 	return TextureSamplePool->AcquireShared();
+}
+
+TSharedPtr<FMediaIOCoreTextureSampleConverter> FNDIMediaPlayer::CreateTextureSampleConverter() const
+{
+	return MakeShared<NDIMediaTextureSampleConverter>();
 }
 #endif
 
