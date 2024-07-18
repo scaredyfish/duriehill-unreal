@@ -1258,7 +1258,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Create(FIntPoint InFrameSize)
 	MappedTexture& CurrentMappedTexture = MappedTextures[CurrentIndex];
 	CurrentMappedTexture.Create(InFrameSize);
 
-	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex + 3) % 4];
+	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
 	PreviousMappedTexture.Create(InFrameSize);
 }
 
@@ -1270,7 +1270,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Destroy()
 	MappedTexture& CurrentMappedTexture = MappedTextures[CurrentIndex];
 	CurrentMappedTexture.Destroy();
 
-	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex + 3) % 4];
+	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
 	PreviousMappedTexture.Destroy();
 }
 
@@ -1336,7 +1336,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Send(FRHICommandListImmediate& R
 	PreviousMappedTexture.Unmap(RHICmdList);
 
 	// Switch the current and previous textures
-	CurrentIndex = (CurrentIndex + 1) % 4;
+	CurrentIndex = 1 - CurrentIndex;
 }
 
 /**
@@ -1352,7 +1352,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Flush(FRHICommandListImmediate& 
 
 	// After send_video_async returns, the frame sent before this one is guaranteed to have been processed
 	// So the texture for the previous frame can be unmapped
-	MappedTexture& PreviousMappedTexture = MappedTextures[(CurrentIndex) + 3 % 4];
+	MappedTexture& PreviousMappedTexture = MappedTextures[1-CurrentIndex];
 	PreviousMappedTexture.Unmap(RHICmdList);
 
 	// As the send queue was flushed, also unmap the current frame as it is not used
@@ -1360,7 +1360,7 @@ void UNDIMediaSender::MappedTextureASyncSender::Flush(FRHICommandListImmediate& 
 	CurrentMappedTexture.Unmap(RHICmdList);
 
 	// Switch the current and previous textures
-	CurrentIndex = (CurrentIndex + 1) % 4;
+	CurrentIndex = 1 - CurrentIndex;
 }
 
 /**

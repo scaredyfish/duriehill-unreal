@@ -336,7 +336,7 @@ private:
 	class MappedTextureASyncSender
 	{
 	private:
-		MappedTexture MappedTextures[4];
+		MappedTexture MappedTextures[2];
 		int32 CurrentIndex = 0;
 
 	public:

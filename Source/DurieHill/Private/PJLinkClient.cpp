@@ -34,6 +34,22 @@ bool PJLinkClient::Connect()
     return Socket->Connect(*Addr);
 }
 
+void PJLinkClient::SendCommandAsync(const FString& Command, FOnConnectDelegate Callback)
+{
+    Async(EAsyncExecution::Thread, [this, Command, Callback]()
+	{
+		bool result = Connect();
+        if (result) {
+            FString Status = Authorize(Command);
+            Callback.Execute(Status);
+        }
+        else
+        {
+            UE_LOG(LogPJLink, Warning, TEXT("Failed to connect to %s"), *Address);
+        } 
+	});
+}
+
 bool PJLinkClient::Disconnect()
 {
     if (Socket == nullptr)
